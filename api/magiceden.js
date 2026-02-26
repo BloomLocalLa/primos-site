@@ -32,6 +32,9 @@ export default async function handler(req, res) {
         const actLimit = req.query.limit || 10
         url = `${ME_API_BASE}/collections/${COLLECTION_SYMBOL}/activities?offset=0&limit=${actLimit}`
         break
+      case 'amm-pools':
+        url = `${ME_API_BASE}/mmm/pools?collectionSymbol=${COLLECTION_SYMBOL}`
+        break
       default:
         return res.status(400).json({ error: 'Invalid endpoint' })
     }

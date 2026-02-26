@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import NFTCard from '../components/NFTCard'
 import GlitchText from '../components/GlitchText'
-import { getListedNFTs, getCollectionStats, getMagicEdenUrl } from '../lib/magiceden'
+import { getListedNFTs, getCollectionStats, getMagicEdenUrl, getAMMPoolListings } from '../lib/magiceden'
 
 const filterOptions = {
   background: ['All', 'Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'],
@@ -32,38 +32,69 @@ export default function Gallery() {
   const fetchNFTs = async () => {
     setLoading(true)
     try {
-      // First get total count
-      const stats = await getCollectionStats()
-      const totalListed = stats.listedCount || 400
+      // Fetch regular listings and AMM pool listings in parallel
+      const [regularListingsPromise, ammPoolsPromise] = await Promise.all([
+        fetchRegularListings(),
+        getAMMPoolListings()
+      ])
 
-      // Fetch ALL listings in batches
-      const batchSize = 100
-      const totalBatches = Math.ceil(totalListed / batchSize)
-      let allListings = []
+      const regularNFTs = regularListingsPromise
+      const ammNFTs = ammPoolsPromise.map((pool, index) => ({
+        id: pool.tokenMint,
+        name: `Primo (Pool)`,
+        image: '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif',
+        price: pool.price,
+        attributes: [],
+        mintAddress: pool.tokenMint,
+        rarity: null,
+        isAMM: true,
+      }))
 
-      for (let i = 0; i < totalBatches; i++) {
-        const listings = await getListedNFTs(i * batchSize, batchSize)
-        if (listings.length === 0) break
-        allListings = [...allListings, ...listings]
-        if (listings.length < batchSize) break
+      // Combine and dedupe by mintAddress
+      const allNFTs = [...regularNFTs]
+      const existingMints = new Set(regularNFTs.map(n => n.mintAddress))
+
+      for (const ammNFT of ammNFTs) {
+        if (!existingMints.has(ammNFT.mintAddress)) {
+          allNFTs.push(ammNFT)
+          existingMints.add(ammNFT.mintAddress)
+        }
       }
 
-      const formattedNFTs = allListings.map((listing, index) => ({
-        id: listing.tokenMint || index + 1,
-        name: listing.token?.name || `Primo #${index}`,
-        image: listing.token?.image || '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif',
-        price: listing.price || 0, // Price is already in SOL from API
-        attributes: listing.token?.attributes || [],
-        mintAddress: listing.tokenMint || listing.token?.mintAddress,
-        rarity: listing.rarity?.meInstant?.rank || null,
-      }))
-      setNfts(formattedNFTs)
-      setHasMore(false) // We fetched all
+      setNfts(allNFTs)
     } catch (error) {
       console.error('Failed to fetch NFTs:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const fetchRegularListings = async () => {
+    // First get total count
+    const stats = await getCollectionStats()
+    const totalListed = stats.listedCount || 400
+
+    // Fetch ALL listings in batches
+    const batchSize = 100
+    const totalBatches = Math.ceil(totalListed / batchSize)
+    let allListings = []
+
+    for (let i = 0; i < totalBatches; i++) {
+      const listings = await getListedNFTs(i * batchSize, batchSize)
+      if (listings.length === 0) break
+      allListings = [...allListings, ...listings]
+      if (listings.length < batchSize) break
+    }
+
+    return allListings.map((listing, index) => ({
+      id: listing.tokenMint || index + 1,
+      name: listing.token?.name || `Primo #${index}`,
+      image: listing.token?.image || '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif',
+      price: listing.price || 0,
+      attributes: listing.token?.attributes || [],
+      mintAddress: listing.tokenMint || listing.token?.mintAddress,
+      rarity: listing.rarity?.meInstant?.rank || null,
+    }))
   }
 
   // Filter and sort NFTs

@@ -105,3 +105,41 @@ export function getMagicEdenUrl(mintAddress) {
 export function getCollectionUrl() {
   return `https://magiceden.io/marketplace/primos`
 }
+
+// Fetch AMM pool listings
+export async function getAMMPoolListings() {
+  const cacheKey = 'amm-pools'
+  const cached = getCached(cacheKey)
+  if (cached) return cached
+
+  try {
+    const response = await fetch(`${API_PROXY}?endpoint=amm-pools`)
+
+    if (!response.ok) throw new Error('Failed to fetch AMM pools')
+
+    const data = await response.json()
+
+    // Extract NFTs from pools that have sellsideAssetAmount > 0
+    const poolNFTs = []
+    if (data.results) {
+      for (const pool of data.results) {
+        if (pool.sellsideAssetAmount > 0 && pool.mints && pool.mints.length > 0) {
+          for (const mint of pool.mints) {
+            poolNFTs.push({
+              tokenMint: mint,
+              price: pool.spotPrice / 1e9, // Convert lamports to SOL
+              source: 'amm',
+              poolKey: pool.poolKey,
+            })
+          }
+        }
+      }
+    }
+
+    setCache(cacheKey, poolNFTs)
+    return poolNFTs
+  } catch (error) {
+    console.error('Error fetching AMM pools:', error)
+    return []
+  }
+}
