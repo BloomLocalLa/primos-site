@@ -42,6 +42,18 @@ export default function GlitchText({
     'text-primo-orange',
   ]
 
+  // Different hover colors for each letter
+  const hoverColors = [
+    '#E91E8C', // primo-pink
+    '#00CED1', // primo-cyan
+    '#FFD700', // primo-yellow
+    '#9B59B6', // primo-purple
+    '#00FF88', // primo-green
+    '#FF6B35', // orange
+    '#FF1493', // hot pink
+    '#00FFFF', // cyan bright
+  ]
+
   return (
     <motion.div
       className={`inline-block ${glitchOnHover ? 'glitch-text' : ''} ${className}`}
@@ -57,11 +69,13 @@ export default function GlitchText({
             rainbow ? rainbowColors[index % rainbowColors.length] : ''
           } ${letter === ' ' ? 'w-4' : ''}`}
           whileHover={{
-            scale: 1.2,
+            scale: 1.3,
             rotate: Math.random() * 20 - 10,
-            color: '#FF1493',
+            color: hoverColors[index % hoverColors.length],
+            textShadow: `0 0 20px ${hoverColors[index % hoverColors.length]}`,
           }}
-          style={{ display: 'inline-block' }}
+          transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+          style={{ display: 'inline-block', cursor: 'default' }}
         >
           {letter === ' ' ? '\u00A0' : letter}
         </motion.span>
