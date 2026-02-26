@@ -1,20 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 export default function CustomCursor() {
-  const [position, setPosition] = useState({ x: 0, y: 0 })
-  const [isHovering, setIsHovering] = useState(false)
-  const [explosions, setExplosions] = useState([])
-  const [trail, setTrail] = useState([
-    { x: 0, y: 0 },
-    { x: 0, y: 0 },
-    { x: 0, y: 0 },
-    { x: 0, y: 0 },
-  ])
+  const containerRef = useRef(null)
+  const centerDotRef = useRef(null)
+  const outerRingRef = useRef(null)
+  const trailRefs = useRef([])
+  const explosionContainerRef = useRef(null)
 
   const colors = ['#E91E8C', '#00CED1', '#FFD700', '#9B59B6']
 
   useEffect(() => {
-    let trailPos = [
+    const trailPos = [
       { x: 0, y: 0 },
       { x: 0, y: 0 },
       { x: 0, y: 0 },
@@ -24,6 +20,7 @@ export default function CustomCursor() {
     let rafId
 
     const updateTrail = () => {
+      // Update trail positions with easing
       trailPos[0].x += (mousePos.x - trailPos[0].x) * 0.3
       trailPos[0].y += (mousePos.y - trailPos[0].y) * 0.3
 
@@ -32,41 +29,59 @@ export default function CustomCursor() {
         trailPos[i].y += (trailPos[i - 1].y - trailPos[i].y) * 0.25
       }
 
-      setTrail([...trailPos.map(p => ({ x: p.x, y: p.y }))])
+      // Directly update DOM elements (no React re-render)
+      trailRefs.current.forEach((el, i) => {
+        if (el) {
+          el.style.transform = `translate(${trailPos[i].x - 7}px, ${trailPos[i].y - 7}px)`
+        }
+      })
+
+      if (centerDotRef.current) {
+        centerDotRef.current.style.transform = `translate(${mousePos.x - 5}px, ${mousePos.y - 5}px)`
+      }
+
+      if (outerRingRef.current) {
+        const size = outerRingRef.current.dataset.hovering === 'true' ? 25 : 20
+        outerRingRef.current.style.transform = `translate(${mousePos.x - size}px, ${mousePos.y - size}px)`
+      }
+
       rafId = requestAnimationFrame(updateTrail)
     }
 
     const onMouseMove = (e) => {
       mousePos = { x: e.clientX, y: e.clientY }
-      setPosition({ x: e.clientX, y: e.clientY })
 
       const el = e.target
-      const clickable = el.closest('a, button') || el.tagName === 'A' || el.tagName === 'BUTTON'
-      setIsHovering(!!clickable)
+      const clickable = el.closest('a, button, [role="button"]') || el.tagName === 'A' || el.tagName === 'BUTTON'
+
+      if (outerRingRef.current) {
+        const isHovering = !!clickable
+        outerRingRef.current.dataset.hovering = isHovering
+        outerRingRef.current.style.width = isHovering ? '50px' : '40px'
+        outerRingRef.current.style.height = isHovering ? '50px' : '40px'
+        outerRingRef.current.style.borderColor = isHovering ? '#E91E8C' : 'rgba(255,255,255,0.6)'
+        outerRingRef.current.style.boxShadow = isHovering ? '0 0 15px #E91E8C' : 'none'
+      }
     }
 
     const onMouseDown = (e) => {
-      // Create explosion particles
-      const newExplosion = {
-        id: Date.now(),
-        x: e.clientX,
-        y: e.clientY,
-        particles: Array.from({ length: 12 }, (_, i) => ({
-          angle: (i * 30) * (Math.PI / 180),
-          color: colors[i % 4],
-          speed: 3 + Math.random() * 3,
-          size: 6 + Math.random() * 6,
-        })),
-      }
-      setExplosions(prev => [...prev, newExplosion])
+      if (!explosionContainerRef.current) return
 
-      // Remove explosion after animation
+      // Create explosion with CSS animations only
+      const explosion = document.createElement('div')
+      explosion.className = 'cursor-explosion'
+      explosion.style.left = e.clientX + 'px'
+      explosion.style.top = e.clientY + 'px'
+
+      explosionContainerRef.current.appendChild(explosion)
+
+      // Remove after animation
       setTimeout(() => {
-        setExplosions(prev => prev.filter(e => e.id !== newExplosion.id))
-      }, 600)
+        explosion.remove()
+      }, 500)
     }
 
-    document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('mousemove', onMouseMove, { passive: true })
     document.addEventListener('mousedown', onMouseDown)
     rafId = requestAnimationFrame(updateTrail)
 
@@ -79,16 +94,9 @@ export default function CustomCursor() {
 
   return (
     <>
-      {/* Global style to hide default cursor */}
-      <style>{`
-        html, body, * {
-          cursor: none !important;
-        }
-      `}</style>
-
       {/* Cursor container */}
       <div
-        id="custom-cursor"
+        ref={containerRef}
         style={{
           position: 'fixed',
           top: 0,
@@ -101,131 +109,83 @@ export default function CustomCursor() {
         }}
       >
         {/* 4 Trailing orbs */}
-        {trail.map((pos, i) => (
+        {colors.map((color, i) => (
           <div
             key={i}
+            ref={el => trailRefs.current[i] = el}
             style={{
               position: 'absolute',
-              left: pos.x,
-              top: pos.y,
+              left: 0,
+              top: 0,
               width: 14,
               height: 14,
-              marginLeft: -7,
-              marginTop: -7,
               borderRadius: '50%',
-              backgroundColor: colors[i],
+              backgroundColor: color,
               opacity: 0.9 - i * 0.15,
-              boxShadow: `0 0 10px ${colors[i]}, 0 0 20px ${colors[i]}50`,
-              transform: `scale(${1 - i * 0.1})`,
+              boxShadow: `0 0 10px ${color}, 0 0 20px ${color}50`,
+              transform: 'translate(-100px, -100px)',
+              willChange: 'transform',
             }}
           />
         ))}
 
         {/* Outer ring */}
         <div
+          ref={outerRingRef}
+          data-hovering="false"
           style={{
             position: 'absolute',
-            left: position.x,
-            top: position.y,
-            width: isHovering ? 50 : 40,
-            height: isHovering ? 50 : 40,
-            marginLeft: isHovering ? -25 : -20,
-            marginTop: isHovering ? -25 : -20,
+            left: 0,
+            top: 0,
+            width: 40,
+            height: 40,
             borderRadius: '50%',
-            border: `2px solid ${isHovering ? '#E91E8C' : 'rgba(255,255,255,0.6)'}`,
-            boxShadow: isHovering ? '0 0 15px #E91E8C' : 'none',
-            transition: 'width 0.2s, height 0.2s, margin 0.2s, border-color 0.2s, box-shadow 0.2s',
+            border: '2px solid rgba(255,255,255,0.6)',
+            transform: 'translate(-100px, -100px)',
+            transition: 'width 0.15s, height 0.15s, border-color 0.15s, box-shadow 0.15s',
+            willChange: 'transform',
           }}
         />
 
         {/* Center dot */}
         <div
+          ref={centerDotRef}
           style={{
             position: 'absolute',
-            left: position.x,
-            top: position.y,
+            left: 0,
+            top: 0,
             width: 10,
             height: 10,
-            marginLeft: -5,
-            marginTop: -5,
             borderRadius: '50%',
             backgroundColor: '#fff',
             boxShadow: '0 0 8px #fff, 0 0 15px rgba(255,255,255,0.5)',
+            transform: 'translate(-100px, -100px)',
+            willChange: 'transform',
           }}
         />
 
-        {/* Click explosions */}
-        {explosions.map((explosion) => (
-          <div key={explosion.id}>
-            {explosion.particles.map((particle, i) => {
-              const endX = Math.cos(particle.angle) * particle.speed * 30
-              const endY = Math.sin(particle.angle) * particle.speed * 30
-              return (
-                <div
-                  key={i}
-                  style={{
-                    position: 'absolute',
-                    left: explosion.x,
-                    top: explosion.y,
-                    width: particle.size,
-                    height: particle.size,
-                    marginLeft: -particle.size / 2,
-                    marginTop: -particle.size / 2,
-                    borderRadius: '50%',
-                    backgroundColor: particle.color,
-                    boxShadow: `0 0 10px ${particle.color}, 0 0 20px ${particle.color}`,
-                    animation: `explode-${i}-${explosion.id} 0.5s ease-out forwards`,
-                  }}
-                >
-                  <style>{`
-                    @keyframes explode-${i}-${explosion.id} {
-                      0% {
-                        transform: translate(0, 0) scale(1);
-                        opacity: 1;
-                      }
-                      100% {
-                        transform: translate(${endX}px, ${endY}px) scale(0);
-                        opacity: 0;
-                      }
-                    }
-                  `}</style>
-                </div>
-              )
-            })}
-            {/* Center flash */}
-            <div
-              style={{
-                position: 'absolute',
-                left: explosion.x,
-                top: explosion.y,
-                width: 40,
-                height: 40,
-                marginLeft: -20,
-                marginTop: -20,
-                borderRadius: '50%',
-                background: 'radial-gradient(circle, #fff 0%, rgba(233,30,140,0.8) 40%, transparent 70%)',
-                animation: 'flash 0.4s ease-out forwards',
-              }}
-            />
-          </div>
-        ))}
+        {/* Explosion container */}
+        <div ref={explosionContainerRef} />
       </div>
 
-      {/* Flash animation */}
+      {/* Cursor styles */}
       <style>{`
-        @keyframes flash {
-          0% {
-            transform: scale(0);
-            opacity: 1;
-          }
-          50% {
-            transform: scale(2);
-            opacity: 0.9;
-          }
-          100% {
-            transform: scale(3);
-            opacity: 0;
-          }
+        .cursor-explosion {
+          position: absolute;
+          width: 40px;
+          height: 40px;
+          margin-left: -20px;
+          margin-top: -20px;
+          border-radius: 50%;
+          background: radial-gradient(circle, #fff 0%, rgba(233,30,140,0.8) 40%, transparent 70%);
+          animation: cursor-flash 0.4s ease-out forwards;
+          pointer-events: none;
+        }
+
+        @keyframes cursor-flash {
+          0% { transform: scale(0); opacity: 1; }
+          50% { transform: scale(2); opacity: 0.8; }
+          100% { transform: scale(3); opacity: 0; }
         }
       `}</style>
     </>
