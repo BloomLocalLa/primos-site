@@ -6,70 +6,53 @@ import {
 } from 'lucide-react'
 import NFTCard from '../components/NFTCard'
 import GlitchText from '../components/GlitchText'
-
-// Actual Primos artwork
-const artworkImages = [
-  '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif',
-  '/artwork/QmagjfWJXmrStQP7sYsEqytPV2yXtyRhKTcT3Ngqw8D1MA.avif',
-  '/artwork/QmamhGh1LjF6tTdWZerkVQjtQVkcThminw57MB3RgU9JVc.avif',
-  '/artwork/QmaXp9riawoo7HMUmZC3SxCPVxTxytGgsoAtCHfT65DFxK.avif',
-  '/artwork/QmbEf76maCZRCUEB8ddGQHHP4iDpr5bPY5aCk25KjRYvSn.avif',
-  '/artwork/QmbR2gsdtid7y3DLZ7ZmDxPs2XWhpX4sTnh5sRnKJbrC5g.avif',
-  '/artwork/QmcjHTh9pyhzSieqCDx5xTu48oUkYvVsHega2LrrDzuUUj.avif',
-  '/artwork/QmdgfUXRHpMHF2cDXS3tM6tedErmD41PkmkP2KpdCUn9LZ.avif',
-  '/artwork/Qme1k7C6Fes3o4TcXBGDP2z8scm7ZKiqUxmjhSS1cAxpqF.avif',
-  '/artwork/QmeuoJELXHRKDHtkhu2bZnPxorGEmY2aogMmsAL2AnG6AQ.avif',
-  '/artwork/QmNMrJGJGcDW5pgxtyzaVfWwMuHqFFpxBi5mYBtKyrp67a.avif',
-  '/artwork/QmR6oggbP6jQQ58vcq4v9MnVqdyzcLdVop2txioTNQHd8M.avif',
-  '/artwork/QmRS4dqpURvQZgL8p2cufx49jFrSyZStwX7irCpPbUNKwi.avif',
-  '/artwork/QmUYe9EFz3g6LLfot2j55bgSsRUHSYYt2ZwsBG4WbcAyDN.avif',
-  '/artwork/QmVCHSGKe3CqcXBS4DMnYKkyurQGcqPPdpsdaDhPCkz6RN.avif',
-  '/artwork/QmX6ywFVdXwPjjUYcYEqhKMttWmW8ueCzZxHSmj8EKNzbL.avif',
-  '/artwork/QmZUWtRTo4RigUSbPwHWQ93gM6azjP1hZCP2HdCLWdp93g.avif',
-]
-
-// Mock data - replace with Magic Eden API
-const mockNFTs = Array(17).fill(0).map((_, i) => ({
-  id: i + 1,
-  name: `Primo #${1000 + i}`,
-  image: artworkImages[i],
-  price: (Math.random() * 5 + 0.5).toFixed(2),
-  rarity: ['common', 'rare', 'epic', 'legendary'][Math.floor(Math.random() * 4)],
-  attributes: [
-    { trait_type: 'Background', value: ['Red', 'Blue', 'Green', 'Yellow'][Math.floor(Math.random() * 4)] },
-    { trait_type: 'Eyes', value: ['Laser', 'Cool', 'Angry', 'Happy'][Math.floor(Math.random() * 4)] },
-    { trait_type: 'Outfit', value: ['Hoodie', 'Suit', 'Casual', 'Retro'][Math.floor(Math.random() * 4)] },
-  ],
-  mintAddress: `primo${i}mintaddress`,
-}))
+import { getListedNFTs, lamportsToSol, getMagicEdenUrl } from '../lib/magiceden'
 
 const filterOptions = {
-  rarity: ['All', 'Common', 'Rare', 'Epic', 'Legendary'],
-  background: ['All', 'Red', 'Blue', 'Green', 'Yellow'],
-  eyes: ['All', 'Laser', 'Cool', 'Angry', 'Happy'],
+  background: ['All', 'Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'],
 }
 
 export default function Gallery() {
-  const [nfts, setNfts] = useState(mockNFTs)
-  const [loading, setLoading] = useState(false)
+  const [nfts, setNfts] = useState([])
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [sortOrder, setSortOrder] = useState('price-asc')
   const [showFilters, setShowFilters] = useState(false)
-  const [gridSize, setGridSize] = useState('normal') // 'normal' or 'large'
+  const [gridSize, setGridSize] = useState('normal')
   const [selectedNFT, setSelectedNFT] = useState(null)
   const [filters, setFilters] = useState({
-    rarity: 'All',
     background: 'All',
-    eyes: 'All',
   })
+
+  // Fetch NFTs from Magic Eden on mount
+  useEffect(() => {
+    fetchNFTs()
+  }, [])
+
+  const fetchNFTs = async () => {
+    setLoading(true)
+    try {
+      const listings = await getListedNFTs(0, 50)
+      const formattedNFTs = listings.map((listing, index) => ({
+        id: index + 1,
+        name: listing.token?.name || `Primo #${index}`,
+        image: listing.token?.image || '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif',
+        price: lamportsToSol(listing.price || 0),
+        attributes: listing.token?.attributes || [],
+        mintAddress: listing.tokenMint || listing.token?.mintAddress,
+      }))
+      setNfts(formattedNFTs)
+    } catch (error) {
+      console.error('Failed to fetch NFTs:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Filter and sort NFTs
   const filteredNFTs = nfts
     .filter((nft) => {
       if (searchQuery && !nft.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return false
-      }
-      if (filters.rarity !== 'All' && nft.rarity.toLowerCase() !== filters.rarity.toLowerCase()) {
         return false
       }
       return true
@@ -80,18 +63,13 @@ export default function Gallery() {
           return parseFloat(a.price) - parseFloat(b.price)
         case 'price-desc':
           return parseFloat(b.price) - parseFloat(a.price)
-        case 'rarity':
-          const rarityOrder = { legendary: 0, epic: 1, rare: 2, common: 3 }
-          return rarityOrder[a.rarity] - rarityOrder[b.rarity]
         default:
           return 0
       }
     })
 
   const refreshData = async () => {
-    setLoading(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await fetchNFTs()
     setLoading(false)
   }
 

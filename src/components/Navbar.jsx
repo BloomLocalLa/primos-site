@@ -60,7 +60,7 @@ export default function Navbar() {
               <motion.img
                 src="/logo.png"
                 alt="Primos"
-                className="w-10 h-10"
+                className="w-10 h-10 rounded-full"
                 whileHover={{ scale: 1.15, rotate: 10 }}
                 transition={{ type: 'spring', stiffness: 400 }}
               />

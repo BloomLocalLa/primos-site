@@ -42,7 +42,7 @@ export default function About() {
             <motion.img
               src="/logo.png"
               alt="Primos"
-              className="w-24 h-24 mx-auto mb-8"
+              className="w-24 h-24 mx-auto mb-8 rounded-full"
               animate={{ rotate: [0, 5, -5, 0] }}
               transition={{ repeat: Infinity, duration: 6 }}
               whileHover={{ scale: 1.1 }}
@@ -85,7 +85,7 @@ export default function About() {
                   transition={{ duration: 4, repeat: Infinity }}
                 >
                   <div className="w-48 h-48 md:w-64 md:h-64 border-4 border-white bg-gradient-to-br from-primo-pink/20 to-primo-cyan/20 flex items-center justify-center">
-                    <img src="/logo.png" alt="Primos" className="w-32 h-32 md:w-40 md:h-40" />
+                    <img src="/logo.png" alt="Primos" className="w-32 h-32 md:w-40 md:h-40 rounded-full" />
                   </div>
                   {/* Decorative corners */}
                   <div className="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2 border-primo-pink" />

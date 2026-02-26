@@ -27,6 +27,51 @@
   --font-body: 'Inter', system-ui, sans-serif;
 }
 
+/* PRIMOS Sports Script/Graffiti Logo Text */
+.primos-logo-text {
+  font-family: 'Lobster', 'Yellowtail', cursive;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  position: relative;
+  display: inline-block;
+  font-style: italic;
+  -webkit-text-stroke: 1.5px #000;
+  text-shadow:
+    4px 4px 0 #E91E8C,
+    8px 8px 0 #00CED1,
+    12px 12px 0 rgba(0,0,0,0.3);
+  transform: rotate(-3deg);
+  filter: drop-shadow(0 0 10px rgba(233, 30, 140, 0.5));
+}
+
+.primos-logo-text::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 5%;
+  width: 90%;
+  height: 4px;
+  background: linear-gradient(90deg, #E91E8C, #00CED1, #FFD700);
+  transform: skewX(-10deg);
+  border-radius: 2px;
+}
+
+/* Smaller variant for nav/footer */
+.primos-logo-text-sm {
+  font-family: 'Lobster', 'Yellowtail', cursive;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  font-style: italic;
+  -webkit-text-stroke: 1px #000;
+  text-shadow:
+    2px 2px 0 #E91E8C,
+    4px 4px 0 #00CED1;
+  transform: rotate(-2deg);
+  display: inline-block;
+}
+
 /* Keyframe Animations */
 @keyframes glitch {
   0% { transform: translate(0); }

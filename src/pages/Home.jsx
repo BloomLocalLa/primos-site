@@ -6,6 +6,7 @@ import {
   ChevronDown, Sparkles, Eye, ArrowRight, Twitter, Headphones, Glasses, HardHat
 } from 'lucide-react'
 import GlitchText from '../components/GlitchText'
+import { getCollectionStats, lamportsToSol } from '../lib/magiceden'
 
 // Featured NFTs - actual Primos artwork
 const featuredNFTs = [
@@ -17,11 +18,12 @@ const featuredNFTs = [
   { id: 6, name: 'Primo #2345', image: '/artwork/QmbR2gsdtid7y3DLZ7ZmDxPs2XWhpX4sTnh5sRnKJbrC5g.avif', price: 3.7, bg: 'bg-blue-900' },
 ]
 
-const stats = [
-  { label: 'SUPPLY', value: '2,746' },
-  { label: 'FLOOR', value: '◎ 0.5' },
-  { label: 'HOLDERS', value: '1.2K+' },
-  { label: 'VOLUME', value: '◎ 2.5K' },
+// Default stats (will be updated with live data)
+const defaultStats = [
+  { label: 'SUPPLY', value: '2,746', key: 'supply' },
+  { label: 'FLOOR', value: '◎ --', key: 'floor' },
+  { label: 'LISTED', value: '--', key: 'listed' },
+  { label: 'VOLUME', value: '◎ --', key: 'volume' },
 ]
 
 const traits = [
@@ -42,6 +44,7 @@ const quickLinks = [
 
 export default function Home() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+  const [stats, setStats] = useState(defaultStats)
   const heroRef = useRef(null)
   const statsRef = useRef(null)
   const traitsRef = useRef(null)
@@ -51,6 +54,27 @@ export default function Home() {
 
   const heroY = useTransform(scrollYProgress, [0, 0.3], [0, -150])
   const heroOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0])
+
+  // Fetch live stats from Magic Eden
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const data = await getCollectionStats()
+        const floorSol = lamportsToSol(data.floorPrice || 0)
+        const volumeSol = (data.volumeAll / 1e9).toFixed(0)
+
+        setStats([
+          { label: 'SUPPLY', value: '2,746', key: 'supply' },
+          { label: 'FLOOR', value: `◎ ${floorSol}`, key: 'floor' },
+          { label: 'LISTED', value: data.listedCount?.toLocaleString() || '--', key: 'listed' },
+          { label: 'VOLUME', value: `◎ ${volumeSol}`, key: 'volume' },
+        ])
+      } catch (error) {
+        console.error('Failed to fetch stats:', error)
+      }
+    }
+    fetchStats()
+  }, [])
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -131,7 +155,7 @@ export default function Home() {
             <motion.img
               src="/logo.png"
               alt="Primos"
-              className="w-32 h-32 md:w-48 md:h-48 mx-auto"
+              className="w-32 h-32 md:w-48 md:h-48 mx-auto rounded-full"
               animate={{
                 filter: [
                   'drop-shadow(0 0 20px rgba(255,255,255,0.3))',
@@ -492,7 +516,7 @@ export default function Home() {
           <motion.img
             src="/logo.png"
             alt="Primos"
-            className="w-20 h-20 mx-auto mb-6"
+            className="w-20 h-20 mx-auto mb-6 rounded-full"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             whileHover={{ rotate: 10 }}
