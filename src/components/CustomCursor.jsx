@@ -6,31 +6,47 @@ export default function CustomCursor() {
   const [isPointer, setIsPointer] = useState(false)
   const [isClicking, setIsClicking] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
-  const [glitchOffset, setGlitchOffset] = useState({ r: 0, g: 0, b: 0 })
-  const trailRef = useRef([])
+  const [trail, setTrail] = useState([
+    { x: 0, y: 0 },
+    { x: 0, y: 0 },
+    { x: 0, y: 0 },
+    { x: 0, y: 0 },
+  ])
+
+  const colors = ['#E91E8C', '#00CED1', '#FFD700', '#9B59B6'] // pink, cyan, yellow, purple
 
   useEffect(() => {
-    // Random glitch effect
-    const glitchInterval = setInterval(() => {
-      if (Math.random() < 0.3) {
-        setGlitchOffset({
-          r: (Math.random() - 0.5) * 6,
-          g: (Math.random() - 0.5) * 4,
-          b: (Math.random() - 0.5) * 6,
-        })
-        setTimeout(() => setGlitchOffset({ r: 0, g: 0, b: 0 }), 50)
-      }
-    }, 200)
+    let animationFrame
+    const trailPositions = [
+      { x: 0, y: 0 },
+      { x: 0, y: 0 },
+      { x: 0, y: 0 },
+      { x: 0, y: 0 },
+    ]
 
-    return () => clearInterval(glitchInterval)
-  }, [])
+    const updateTrail = () => {
+      // Each element follows the previous one with delay
+      trailPositions[0].x += (position.x - trailPositions[0].x) * 0.3
+      trailPositions[0].y += (position.y - trailPositions[0].y) * 0.3
+
+      for (let i = 1; i < 4; i++) {
+        trailPositions[i].x += (trailPositions[i - 1].x - trailPositions[i].x) * 0.25
+        trailPositions[i].y += (trailPositions[i - 1].y - trailPositions[i].y) * 0.25
+      }
+
+      setTrail([...trailPositions])
+      animationFrame = requestAnimationFrame(updateTrail)
+    }
+
+    animationFrame = requestAnimationFrame(updateTrail)
+    return () => cancelAnimationFrame(animationFrame)
+  }, [position])
 
   useEffect(() => {
     const handleMouseMove = (e) => {
       setPosition({ x: e.clientX, y: e.clientY })
       setIsVisible(true)
 
-      // Check if hovering over clickable element
       const target = e.target
       const isClickable = target.tagName === 'A' ||
         target.tagName === 'BUTTON' ||
@@ -75,131 +91,114 @@ export default function CustomCursor() {
           {/* Hide default cursor */}
           <style>{`* { cursor: none !important; }`}</style>
 
-          {/* RGB Glitch Layers */}
+          {/* Trailing colored elements */}
+          {trail.map((pos, i) => (
+            <motion.div
+              key={i}
+              className="fixed pointer-events-none z-[9998]"
+              style={{
+                left: pos.x - 6,
+                top: pos.y - 6,
+              }}
+            >
+              <motion.div
+                animate={{
+                  scale: isPointer ? 1.3 : 1,
+                }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: '50%',
+                  backgroundColor: colors[i],
+                  opacity: 0.9 - (i * 0.15),
+                  boxShadow: `0 0 ${10 + i * 2}px ${colors[i]}`,
+                }}
+              />
+            </motion.div>
+          ))}
+
+          {/* Outer ring */}
           <motion.div
-            className="fixed pointer-events-none z-[9998]"
+            className="fixed pointer-events-none z-[9999]"
             animate={{
-              x: position.x - 12 + glitchOffset.r,
-              y: position.y - 12,
+              x: position.x - 20,
+              y: position.y - 20,
+              scale: isPointer ? 1.4 : isClicking ? 0.8 : 1,
             }}
-            transition={{ type: 'spring', stiffness: 800, damping: 35 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
           >
             <div
-              className="w-6 h-6 opacity-50"
               style={{
-                background: 'transparent',
-                border: '2px solid #ff0000',
-                mixBlendMode: 'screen',
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
+                border: `2px solid ${isPointer ? '#E91E8C' : 'rgba(255,255,255,0.6)'}`,
+                boxShadow: isPointer ? '0 0 15px #E91E8C' : 'none',
+                transition: 'border-color 0.2s, box-shadow 0.2s',
               }}
             />
           </motion.div>
 
-          <motion.div
-            className="fixed pointer-events-none z-[9998]"
-            animate={{
-              x: position.x - 12 + glitchOffset.b,
-              y: position.y - 12,
-            }}
-            transition={{ type: 'spring', stiffness: 800, damping: 35 }}
-          >
-            <div
-              className="w-6 h-6 opacity-50"
-              style={{
-                background: 'transparent',
-                border: '2px solid #00ffff',
-                mixBlendMode: 'screen',
-              }}
-            />
-          </motion.div>
-
-          {/* Main Cursor - Retro Crosshair */}
+          {/* Center dot */}
           <motion.div
             className="fixed pointer-events-none z-[10000]"
-            initial={{ opacity: 0, scale: 0 }}
             animate={{
-              opacity: 1,
-              x: position.x - 16,
-              y: position.y - 16,
-              scale: isClicking ? 0.8 : isPointer ? 1.2 : 1,
-              rotate: isPointer ? 45 : 0,
+              x: position.x - 5,
+              y: position.y - 5,
+              scale: isClicking ? 1.5 : 1,
             }}
-            exit={{ opacity: 0, scale: 0 }}
             transition={{ type: 'spring', stiffness: 600, damping: 30 }}
           >
-            {/* Crosshair Design */}
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-              {/* Outer corners */}
-              <path d="M4 4 L4 10" stroke={isPointer ? '#E91E8C' : '#ffffff'} strokeWidth="2"/>
-              <path d="M4 4 L10 4" stroke={isPointer ? '#E91E8C' : '#ffffff'} strokeWidth="2"/>
-
-              <path d="M28 4 L28 10" stroke={isPointer ? '#00CED1' : '#ffffff'} strokeWidth="2"/>
-              <path d="M28 4 L22 4" stroke={isPointer ? '#00CED1' : '#ffffff'} strokeWidth="2"/>
-
-              <path d="M4 28 L4 22" stroke={isPointer ? '#FFD700' : '#ffffff'} strokeWidth="2"/>
-              <path d="M4 28 L10 28" stroke={isPointer ? '#FFD700' : '#ffffff'} strokeWidth="2"/>
-
-              <path d="M28 28 L28 22" stroke={isPointer ? '#9B59B6' : '#ffffff'} strokeWidth="2"/>
-              <path d="M28 28 L22 28" stroke={isPointer ? '#9B59B6' : '#ffffff'} strokeWidth="2"/>
-
-              {/* Center dot */}
-              <circle
-                cx="16"
-                cy="16"
-                r={isPointer ? 4 : 2}
-                fill={isPointer ? '#E91E8C' : '#ffffff'}
-              />
-
-              {/* Center crosshair */}
-              <path d="M16 10 L16 14" stroke={isPointer ? '#E91E8C' : '#ffffff'} strokeWidth="1.5"/>
-              <path d="M16 18 L16 22" stroke={isPointer ? '#E91E8C' : '#ffffff'} strokeWidth="1.5"/>
-              <path d="M10 16 L14 16" stroke={isPointer ? '#E91E8C' : '#ffffff'} strokeWidth="1.5"/>
-              <path d="M18 16 L22 16" stroke={isPointer ? '#E91E8C' : '#ffffff'} strokeWidth="1.5"/>
-            </svg>
-          </motion.div>
-
-          {/* Click ripple effect */}
-          <AnimatePresence>
-            {isClicking && (
-              <motion.div
-                className="fixed pointer-events-none z-[9997]"
-                initial={{
-                  x: position.x - 30,
-                  y: position.y - 30,
-                  scale: 0,
-                  opacity: 1
-                }}
-                animate={{
-                  scale: 2,
-                  opacity: 0
-                }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
-              >
-                <div
-                  className="w-[60px] h-[60px] rounded-full border-2 border-primo-pink"
-                  style={{ boxShadow: '0 0 20px #E91E8C' }}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Scanline effect on cursor */}
-          <motion.div
-            className="fixed pointer-events-none z-[10001] overflow-hidden"
-            animate={{
-              x: position.x - 16,
-              y: position.y - 16,
-            }}
-            transition={{ type: 'spring', stiffness: 800, damping: 35 }}
-          >
             <div
-              className="w-8 h-8"
               style={{
-                background: 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px)',
-                pointerEvents: 'none',
+                width: 10,
+                height: 10,
+                borderRadius: '50%',
+                backgroundColor: '#ffffff',
+                boxShadow: '0 0 10px rgba(255,255,255,0.8)',
               }}
             />
           </motion.div>
+
+          {/* Click burst effect */}
+          <AnimatePresence>
+            {isClicking && (
+              <>
+                {colors.map((color, i) => (
+                  <motion.div
+                    key={`burst-${i}`}
+                    className="fixed pointer-events-none z-[9997]"
+                    initial={{
+                      x: position.x - 8,
+                      y: position.y - 8,
+                      scale: 0,
+                      opacity: 1,
+                      rotate: i * 90,
+                    }}
+                    animate={{
+                      scale: 3,
+                      opacity: 0,
+                      x: position.x - 8 + Math.cos(i * Math.PI / 2) * 30,
+                      y: position.y - 8 + Math.sin(i * Math.PI / 2) * 30,
+                    }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4, ease: 'easeOut' }}
+                  >
+                    <div
+                      style={{
+                        width: 16,
+                        height: 16,
+                        borderRadius: '50%',
+                        backgroundColor: color,
+                        boxShadow: `0 0 10px ${color}`,
+                      }}
+                    />
+                  </motion.div>
+                ))}
+              </>
+            )}
+          </AnimatePresence>
         </>
       )}
     </AnimatePresence>
