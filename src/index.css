@@ -102,8 +102,10 @@
 }
 
 /* Global Styles - Custom cursor handled by CustomCursor.jsx */
-* {
-  cursor: none !important;
+@media (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
 }
 
 html {
