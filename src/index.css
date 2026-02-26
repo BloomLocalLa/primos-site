@@ -101,9 +101,9 @@
   50% { transform: rotate(3deg); }
 }
 
-/* Global Styles */
+/* Global Styles - Custom cursor handled by CustomCursor.jsx */
 * {
-  cursor: crosshair;
+  cursor: none !important;
 }
 
 html {

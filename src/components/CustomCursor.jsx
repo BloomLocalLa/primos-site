@@ -5,7 +5,7 @@ export default function CustomCursor() {
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [isPointer, setIsPointer] = useState(false)
   const [isClicking, setIsClicking] = useState(false)
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
   const [trail, setTrail] = useState([
     { x: 0, y: 0 },
     { x: 0, y: 0 },
@@ -88,9 +88,6 @@ export default function CustomCursor() {
     <AnimatePresence>
       {isVisible && (
         <>
-          {/* Hide default cursor */}
-          <style>{`* { cursor: none !important; }`}</style>
-
           {/* Trailing colored elements */}
           {trail.map((pos, i) => (
             <motion.div
