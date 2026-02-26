@@ -86,15 +86,20 @@ export default function Gallery() {
       if (listings.length < batchSize) break
     }
 
-    return allListings.map((listing, index) => ({
-      id: listing.tokenMint || index + 1,
-      name: listing.token?.name || `Primo #${index}`,
-      image: listing.token?.image || '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif',
-      price: listing.price || 0,
-      attributes: listing.token?.attributes || [],
-      mintAddress: listing.tokenMint || listing.token?.mintAddress,
-      rarity: listing.rarity?.meInstant?.rank || null,
-    }))
+    return allListings.map((listing, index) => {
+      // Extract rarity rank - ensure it's a number
+      const rarityRank = listing.rarity?.meInstant?.rank
+
+      return {
+        id: listing.tokenMint || index + 1,
+        name: listing.token?.name || `Primo #${index}`,
+        image: listing.token?.image || '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif',
+        price: listing.price || 0,
+        attributes: listing.token?.attributes || [],
+        mintAddress: listing.tokenMint || listing.token?.mintAddress,
+        rarity: typeof rarityRank === 'number' ? rarityRank : (rarityRank ? parseInt(rarityRank, 10) : null),
+      }
+    })
   }
 
   // Filter and sort NFTs
@@ -337,11 +342,14 @@ export default function Gallery() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 className={`fixed left-1/2 top-[55%] -translate-x-1/2 -translate-y-1/2 z-[101] bg-black border-4 w-[95vw] md:w-[85vw] lg:w-[75vw] max-w-5xl h-auto max-h-[75vh] ${
-                  selectedNFT.rarity && selectedNFT.rarity <= 100 ? 'border-primo-yellow shadow-[0_0_30px_rgba(255,215,0,0.5)]' :
-                  selectedNFT.rarity && selectedNFT.rarity <= 500 ? 'border-primo-purple shadow-[0_0_30px_rgba(155,89,182,0.5)]' :
-                  selectedNFT.rarity && selectedNFT.rarity <= 1000 ? 'border-primo-cyan shadow-[0_0_30px_rgba(0,206,209,0.5)]' :
-                  selectedNFT.rarity && selectedNFT.rarity <= 2000 ? 'border-primo-green shadow-[0_0_20px_rgba(0,255,0,0.3)]' :
-                  'border-white'
+                  (() => {
+                    const rank = selectedNFT.rarity
+                    if (rank && rank <= 100) return 'border-primo-yellow shadow-[0_0_30px_rgba(255,215,0,0.5)]'
+                    if (rank && rank <= 500) return 'border-primo-purple shadow-[0_0_30px_rgba(155,89,182,0.5)]'
+                    if (rank && rank <= 1000) return 'border-primo-cyan shadow-[0_0_30px_rgba(0,206,209,0.5)]'
+                    if (rank && rank <= 2000) return 'border-primo-green shadow-[0_0_20px_rgba(0,255,0,0.3)]'
+                    return 'border-white'
+                  })()
                 }`}
               >
                 <button
