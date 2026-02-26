@@ -15,11 +15,29 @@ export default function NFTCard({ nft, index = 0 }) {
     mintAddress,
   } = nft || {}
 
-  const rarityColors = {
-    legendary: 'from-primo-yellow to-primo-orange',
-    epic: 'from-primo-purple to-primo-pink',
-    rare: 'from-primo-cyan to-primo-green',
-    common: 'from-static-gray to-static-dark',
+  // Get border color based on rarity rank
+  const getBorderColor = () => {
+    if (rarity && rarity <= 100) return '#FFD700' // Gold - Legendary
+    if (rarity && rarity <= 500) return '#9D4EDD' // Purple - Epic
+    if (rarity && rarity <= 1000) return '#00CED1' // Cyan - Rare
+    if (rarity && rarity <= 2000) return '#32CD32' // Green - Uncommon
+    return '#FFFFFF' // White - Common
+  }
+
+  const getGlowColor = () => {
+    if (rarity && rarity <= 100) return '0 0 15px rgba(255,215,0,0.4)'
+    if (rarity && rarity <= 500) return '0 0 15px rgba(157,78,221,0.4)'
+    if (rarity && rarity <= 1000) return '0 0 15px rgba(0,206,209,0.4)'
+    if (rarity && rarity <= 2000) return '0 0 10px rgba(50,205,50,0.3)'
+    return 'none'
+  }
+
+  const getRarityLabel = () => {
+    if (rarity && rarity <= 100) return 'LEGENDARY'
+    if (rarity && rarity <= 500) return 'EPIC'
+    if (rarity && rarity <= 1000) return 'RARE'
+    if (rarity && rarity <= 2000) return 'UNCOMMON'
+    return 'COMMON'
   }
 
   return (
@@ -33,7 +51,13 @@ export default function NFTCard({ nft, index = 0 }) {
       className="relative group"
     >
       {/* Card */}
-      <div className="relative bg-black border-4 border-white overflow-hidden">
+      <div
+        className="relative bg-black overflow-hidden"
+        style={{
+          border: `4px solid ${getBorderColor()}`,
+          boxShadow: getGlowColor()
+        }}
+      >
         {/* Glitch Effect on Hover */}
         {isHovered && (
           <>
@@ -69,8 +93,14 @@ export default function NFTCard({ nft, index = 0 }) {
 
           {/* Rarity Badge */}
           {rarity && (
-            <div className={`absolute top-2 right-2 px-2 py-1 bg-gradient-to-r ${rarityColors[rarity] || rarityColors.common} text-black text-xs font-display uppercase tracking-wider`}>
-              {rarity}
+            <div
+              className="absolute top-2 right-2 px-2 py-1 text-xs font-display uppercase tracking-wider"
+              style={{
+                backgroundColor: getBorderColor(),
+                color: rarity <= 500 ? '#FFFFFF' : '#000000'
+              }}
+            >
+              {getRarityLabel()}
             </div>
           )}
 
@@ -103,7 +133,7 @@ export default function NFTCard({ nft, index = 0 }) {
         </div>
 
         {/* Info Section */}
-        <div className="p-3 border-t-4 border-white">
+        <div className="p-3" style={{ borderTop: `4px solid ${getBorderColor()}` }}>
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-display text-white truncate">{name}</h3>
             {isHovered && (
