@@ -117,7 +117,10 @@ export default function Gallery() {
         case 'price-desc':
           return b.price - a.price
         case 'rarity':
-          return (a.rarity || 9999) - (b.rarity || 9999)
+          // Use ?? to handle 0 correctly, put null/undefined at bottom
+          const aRank = a.rarity ?? 99999
+          const bRank = b.rarity ?? 99999
+          return aRank - bRank
         default:
           return 0
       }
