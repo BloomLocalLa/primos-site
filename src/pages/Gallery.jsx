@@ -328,7 +328,7 @@ export default function Gallery() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setSelectedNFT(null)}
-                className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50"
+                className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[100]"
               />
 
               {/* Modal */}
@@ -336,7 +336,7 @@ export default function Gallery() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-black border-4 border-white w-[95vw] md:w-[85vw] lg:w-[75vw] max-w-5xl h-auto max-h-[85vh]"
+                className="fixed left-1/2 top-[55%] -translate-x-1/2 -translate-y-1/2 z-[101] bg-black border-4 border-white w-[95vw] md:w-[85vw] lg:w-[75vw] max-w-5xl h-auto max-h-[75vh]"
               >
                 <button
                   onClick={() => setSelectedNFT(null)}
