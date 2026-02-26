@@ -52,7 +52,7 @@ export default function NFTCard({ nft, index = 0 }) {
     >
       {/* Card */}
       <div
-        className="relative bg-black overflow-hidden"
+        className={`relative bg-black overflow-hidden ${rarity && rarity <= 500 ? 'sparkle-card' : ''}`}
         style={{
           border: `4px solid ${getBorderColor()}`,
           boxShadow: getGlowColor()
