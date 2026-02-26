@@ -25,12 +25,12 @@ const stats = [
 ]
 
 const traits = [
-  { name: 'HOODS', count: '2,746', icon: '🧥' },
-  { name: 'SUNGLASSES', count: '1,842', icon: '🕶️' },
-  { name: 'HARD HATS', count: '423', icon: '👷' },
-  { name: 'HEADPHONES', count: '687', icon: '🎧' },
-  { name: 'BACKGROUNDS', count: '12', icon: '🎨' },
-  { name: 'EXPRESSIONS', count: '8', icon: '😎' },
+  { name: 'HOODS', count: '2,746', image: '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif' },
+  { name: 'SUNGLASSES', count: '1,842', image: '/artwork/QmagjfWJXmrStQP7sYsEqytPV2yXtyRhKTcT3Ngqw8D1MA.avif' },
+  { name: 'HARD HATS', count: '423', image: '/artwork/QmamhGh1LjF6tTdWZerkVQjtQVkcThminw57MB3RgU9JVc.avif' },
+  { name: 'HEADPHONES', count: '687', image: '/artwork/QmaXp9riawoo7HMUmZC3SxCPVxTxytGgsoAtCHfT65DFxK.avif' },
+  { name: 'BACKGROUNDS', count: '12', image: '/artwork/QmbEf76maCZRCUEB8ddGQHHP4iDpr5bPY5aCk25KjRYvSn.avif' },
+  { name: 'EXPRESSIONS', count: '8', image: '/artwork/QmbR2gsdtid7y3DLZ7ZmDxPs2XWhpX4sTnh5sRnKJbrC5g.avif' },
 ]
 
 const quickLinks = [
@@ -327,12 +327,34 @@ export default function Home() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={isTraitsInView ? { opacity: 1, scale: 1 } : {}}
                 transition={{ delay: index * 0.08 }}
-                whileHover={{ scale: 1.05, y: -5 }}
-                className="bg-white/5 border border-white/10 p-6 text-center group hover:border-primo-pink/50 transition-colors"
+                whileHover={{ scale: 1.08, y: -8 }}
+                className="group cursor-pointer"
               >
-                <div className="text-4xl mb-3">{trait.icon}</div>
-                <div className="font-display text-white text-sm mb-1">{trait.name}</div>
-                <div className="font-mono text-primo-cyan text-xs">{trait.count}</div>
+                <div className="relative bg-black border-2 border-white/20 overflow-hidden group-hover:border-primo-pink transition-colors">
+                  {/* Image */}
+                  <div className="aspect-square overflow-hidden">
+                    <img
+                      src={trait.image}
+                      alt={trait.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    {/* Overlay gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+                  </div>
+
+                  {/* Info overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-3 text-center">
+                    <div className="font-display text-white text-sm tracking-wider">{trait.name}</div>
+                    <div className="font-mono text-primo-cyan text-xs">{trait.count}</div>
+                  </div>
+
+                  {/* Glitch line on hover */}
+                  <motion.div
+                    className="absolute top-0 left-0 right-0 h-1 bg-primo-pink opacity-0 group-hover:opacity-100"
+                    animate={{ scaleX: [0, 1, 0] }}
+                    transition={{ duration: 0.5, repeat: Infinity }}
+                  />
+                </div>
               </motion.div>
             ))}
           </div>
