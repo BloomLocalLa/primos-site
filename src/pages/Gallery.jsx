@@ -117,10 +117,15 @@ export default function Gallery() {
         case 'price-desc':
           return b.price - a.price
         case 'rarity':
-          // Use ?? to handle 0 correctly, put null/undefined at bottom
-          const aRank = a.rarity ?? 99999
-          const bRank = b.rarity ?? 99999
-          return aRank - bRank
+          // Put NFTs without rarity at the very bottom
+          const aHasRarity = a.rarity !== null && a.rarity !== undefined
+          const bHasRarity = b.rarity !== null && b.rarity !== undefined
+
+          if (!aHasRarity && !bHasRarity) return 0 // Both no rarity, keep order
+          if (!aHasRarity) return 1 // a has no rarity, put after b
+          if (!bHasRarity) return -1 // b has no rarity, put after a
+
+          return a.rarity - b.rarity // Both have rarity, lower rank = rarer = first
         default:
           return 0
       }
