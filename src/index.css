@@ -1,0 +1,567 @@
+@import "tailwindcss";
+
+/* PRIMOS NFT THEME - Bold, Vibrant, Community */
+@theme {
+  /* Primary Colors - Matched to Collection */
+  --color-primo-pink: #E91E8C;
+  --color-primo-magenta: #FF1493;
+  --color-primo-cyan: #00CED1;
+  --color-primo-teal: #20B2AA;
+  --color-primo-purple: #9D4EDD;
+  --color-primo-yellow: #FFD700;
+  --color-primo-orange: #FF8C00;
+  --color-primo-coral: #FF6B6B;
+  --color-primo-blue: #4169E1;
+  --color-primo-green: #32CD32;
+
+  /* Grayscale */
+  --color-static-white: #FFFFFF;
+  --color-static-light: #E5E5E5;
+  --color-static-gray: #888888;
+  --color-static-dark: #1a1a1a;
+  --color-static-black: #000000;
+
+  /* Fonts */
+  --font-display: 'Impact', 'Haettenschweiler', 'Arial Narrow Bold', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+/* Keyframe Animations */
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-3px, 3px); }
+  40% { transform: translate(-3px, -3px); }
+  60% { transform: translate(3px, 3px); }
+  80% { transform: translate(3px, -3px); }
+  100% { transform: translate(0); }
+}
+
+@keyframes rgbShift {
+  0% { text-shadow: -2px 0 #E91E8C, 2px 0 #00CED1; }
+  25% { text-shadow: 2px 0 #E91E8C, -2px 0 #00CED1; }
+  50% { text-shadow: -2px 0 #00CED1, 2px 0 #E91E8C; }
+  75% { text-shadow: 2px 0 #00CED1, -2px 0 #E91E8C; }
+  100% { text-shadow: -2px 0 #E91E8C, 2px 0 #00CED1; }
+}
+
+@keyframes static {
+  0%, 100% { opacity: 0.02; }
+  50% { opacity: 0.05; }
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.8; }
+  94% { opacity: 1; }
+  95% { opacity: 0.9; }
+  96% { opacity: 1; }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(3deg); }
+}
+
+@keyframes pulse-border {
+  0%, 100% { border-color: #E91E8C; }
+  50% { border-color: #00CED1; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { filter: drop-shadow(0 0 10px currentColor); }
+  50% { filter: drop-shadow(0 0 30px currentColor) drop-shadow(0 0 50px currentColor); }
+}
+
+@keyframes slide-bg {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes rotate-hue {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+@keyframes bounce-in {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes wave {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+/* Global Styles */
+* {
+  cursor: crosshair;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-static-black);
+  color: var(--color-static-white);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+/* Noise Overlay - Heavy TV Static */
+.vhs-static::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 9999;
+  animation: static 0.15s infinite;
+}
+
+/* Glitched Artwork Background Layer */
+.vhs-static::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.3) 2px,
+      rgba(0, 0, 0, 0.3) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 0, 100, 0.03),
+      rgba(255, 0, 100, 0.03) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+  pointer-events: none;
+  z-index: 9998;
+  animation: horizontalShift 0.1s infinite;
+}
+
+@keyframes horizontalShift {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-1px); }
+  50% { transform: translateX(1px); }
+  75% { transform: translateX(-0.5px); }
+  100% { transform: translateX(0); }
+}
+
+/* Scanlines - CRT Effect */
+.scanlines::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.15),
+      rgba(0, 0, 0, 0.15) 1px,
+      transparent 1px,
+      transparent 2px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 0, 150, 0.02) 0px,
+      rgba(0, 255, 255, 0.02) 1px,
+      rgba(255, 255, 0, 0.02) 2px,
+      transparent 3px
+    );
+  pointer-events: none;
+  z-index: 9997;
+  animation: scanlineFlicker 0.05s infinite;
+}
+
+@keyframes scanlineFlicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.98; }
+}
+
+/* RGB Pixel Grid - Like CRT phosphors */
+.rgb-grid {
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 0, 0, 0.06) 0px,
+      rgba(255, 0, 0, 0.06) 1px,
+      rgba(0, 255, 0, 0.06) 1px,
+      rgba(0, 255, 0, 0.06) 2px,
+      rgba(0, 0, 255, 0.06) 2px,
+      rgba(0, 0, 255, 0.06) 3px,
+      transparent 3px,
+      transparent 6px
+    );
+}
+
+/* Channel changing effect */
+@keyframes channelChange {
+  0% { filter: none; }
+  10% { filter: hue-rotate(90deg) saturate(2); }
+  20% { filter: none; transform: translateX(-5px); }
+  30% { filter: invert(0.1); }
+  40% { filter: none; transform: translateY(3px); }
+  50% { filter: saturate(3) contrast(1.2); }
+  60% { filter: none; }
+  70% { filter: hue-rotate(-45deg); transform: skewX(1deg); }
+  80% { filter: none; }
+  90% { filter: brightness(1.2); }
+  100% { filter: none; }
+}
+
+.channel-surf {
+  animation: channelChange 10s infinite;
+}
+
+/* Vertical hold issue effect */
+@keyframes verticalHold {
+  0%, 95%, 100% { transform: translateY(0); }
+  96% { transform: translateY(-10px); }
+  97% { transform: translateY(5px); }
+  98% { transform: translateY(-3px); }
+  99% { transform: translateY(2px); }
+}
+
+.vertical-hold {
+  animation: verticalHold 8s infinite;
+}
+
+/* Color banding effect */
+.color-bands {
+  position: relative;
+}
+
+.color-bands::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(255, 0, 150, 0.05) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(0, 255, 255, 0.05) 50%,
+      transparent 75%,
+      rgba(255, 255, 0, 0.03) 75%,
+      transparent 100%
+    );
+  background-size: 100% 400px;
+  animation: colorBandScroll 3s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes colorBandScroll {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 400px; }
+}
+
+/* Glitch Text */
+.glitch-text {
+  position: relative;
+  animation: flicker 4s infinite;
+}
+
+.glitch-text:hover {
+  animation: glitch 0.2s infinite, rgbShift 0.3s infinite;
+}
+
+/* Neon Glow */
+.neon-pink {
+  text-shadow: 0 0 10px #E91E8C, 0 0 20px #E91E8C, 0 0 40px #E91E8C;
+}
+
+.neon-cyan {
+  text-shadow: 0 0 10px #00CED1, 0 0 20px #00CED1, 0 0 40px #00CED1;
+}
+
+/* Gradient Backgrounds - Matching Collection */
+.bg-primo-gradient {
+  background: linear-gradient(135deg, #E91E8C 0%, #9D4EDD 50%, #00CED1 100%);
+}
+
+.bg-primo-gradient-dark {
+  background: linear-gradient(135deg, #1a0a1a 0%, #0a1a1a 100%);
+}
+
+.bg-pink-glow {
+  background: radial-gradient(ellipse at center, rgba(233, 30, 140, 0.3) 0%, transparent 70%);
+}
+
+.bg-cyan-glow {
+  background: radial-gradient(ellipse at center, rgba(0, 206, 209, 0.3) 0%, transparent 70%);
+}
+
+/* Animated Gradient Border */
+.gradient-border {
+  position: relative;
+  background: black;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  background: linear-gradient(45deg, #E91E8C, #00CED1, #FFD700, #9D4EDD, #E91E8C);
+  background-size: 400% 400%;
+  animation: slide-bg 4s ease infinite;
+  z-index: -1;
+}
+
+/* Retro Button - Updated */
+.retro-btn {
+  position: relative;
+  background: linear-gradient(135deg, #E91E8C, #9D4EDD);
+  border: 3px solid white;
+  padding: 14px 28px;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: white;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.retro-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.4s ease;
+}
+
+.retro-btn:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 4px 4px 0 white, 8px 8px 0 rgba(233, 30, 140, 0.5);
+}
+
+.retro-btn:hover::before {
+  left: 100%;
+}
+
+.retro-btn:active {
+  transform: translate(0, 0);
+  box-shadow: none;
+}
+
+/* Marquee - Smoother */
+.marquee {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.marquee-content {
+  display: inline-block;
+  animation: marquee 30s linear infinite;
+}
+
+/* Card Hover Effects */
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+}
+
+.card-3d:hover {
+  transform: perspective(1000px) rotateX(5deg) rotateY(-5deg) scale(1.02);
+}
+
+/* Trait Tags - Like the NFT traits */
+.trait-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.trait-tag:hover {
+  background: rgba(233, 30, 140, 0.3);
+  border-color: #E91E8C;
+}
+
+/* Hood Shape Decoration */
+.hood-shape {
+  clip-path: ellipse(50% 60% at 50% 40%);
+}
+
+/* Floating Animation */
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Wave Animation */
+.wave {
+  animation: wave 3s ease-in-out infinite;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #E91E8C, #00CED1);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #FF1493, #20B2AA);
+}
+
+/* Selection */
+::selection {
+  background: #E91E8C;
+  color: black;
+}
+
+/* Link Styles */
+a {
+  color: #00CED1;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+a:hover {
+  color: #E91E8C;
+  text-shadow: 0 0 10px #E91E8C;
+}
+
+/* Character Card - Matching NFT Style */
+.primo-card {
+  position: relative;
+  background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+  border: 3px solid white;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.primo-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #E91E8C, #00CED1);
+}
+
+.primo-card:hover {
+  border-color: #E91E8C;
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(233, 30, 140, 0.3);
+}
+
+/* Text with Stroke */
+.text-stroke {
+  -webkit-text-stroke: 2px white;
+  color: transparent;
+}
+
+.text-stroke:hover {
+  color: white;
+  -webkit-text-stroke: 2px transparent;
+}
+
+/* Sunglasses Reflection Effect */
+.sunglasses-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.sunglasses-shine::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  50%, 100% { left: 200%; }
+}
+
+/* Construction Hat Yellow Accent */
+.accent-yellow {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+}
+
+/* Purple Hood Gradient */
+.hood-gradient {
+  background: linear-gradient(180deg, #9D4EDD 0%, #6B21A8 100%);
+}
+
+/* Teal Background Style */
+.bg-teal-dark {
+  background: linear-gradient(180deg, #0D4F4F 0%, #0a2a2a 100%);
+}
+
+/* Pink Background Style */
+.bg-pink-dark {
+  background: linear-gradient(180deg, #4a0e2e 0%, #1a0a1a 100%);
+}
+
+/* Community Badge */
+.community-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(233, 30, 140, 0.2);
+  border: 1px solid #E91E8C;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+/* Infinite scroll shadow */
+.scroll-shadow-left {
+  box-shadow: inset 40px 0 30px -30px black;
+}
+
+.scroll-shadow-right {
+  box-shadow: inset -40px 0 30px -30px black;
+}
