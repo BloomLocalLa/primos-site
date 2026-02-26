@@ -341,16 +341,25 @@ export default function Gallery() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className={`fixed left-1/2 top-[55%] -translate-x-1/2 -translate-y-1/2 z-[101] bg-black border-4 w-[95vw] md:w-[85vw] lg:w-[75vw] max-w-5xl h-auto max-h-[75vh] ${
-                  (() => {
+                className="fixed left-1/2 top-[55%] -translate-x-1/2 -translate-y-1/2 z-[101] bg-black border-4 w-[95vw] md:w-[85vw] lg:w-[75vw] max-w-5xl h-auto max-h-[75vh]"
+                style={{
+                  borderColor: (() => {
                     const rank = selectedNFT.rarity
-                    if (rank && rank <= 100) return 'border-primo-yellow shadow-[0_0_30px_rgba(255,215,0,0.5)]'
-                    if (rank && rank <= 500) return 'border-primo-purple shadow-[0_0_30px_rgba(155,89,182,0.5)]'
-                    if (rank && rank <= 1000) return 'border-primo-cyan shadow-[0_0_30px_rgba(0,206,209,0.5)]'
-                    if (rank && rank <= 2000) return 'border-primo-green shadow-[0_0_20px_rgba(0,255,0,0.3)]'
-                    return 'border-white'
+                    if (rank && rank <= 100) return '#FFD700'
+                    if (rank && rank <= 500) return '#9D4EDD'
+                    if (rank && rank <= 1000) return '#00CED1'
+                    if (rank && rank <= 2000) return '#32CD32'
+                    return '#FFFFFF'
+                  })(),
+                  boxShadow: (() => {
+                    const rank = selectedNFT.rarity
+                    if (rank && rank <= 100) return '0 0 30px rgba(255,215,0,0.5)'
+                    if (rank && rank <= 500) return '0 0 30px rgba(157,78,221,0.5)'
+                    if (rank && rank <= 1000) return '0 0 30px rgba(0,206,209,0.5)'
+                    if (rank && rank <= 2000) return '0 0 20px rgba(50,205,50,0.3)'
+                    return 'none'
                   })()
-                }`}
+                }}
               >
                 <button
                   onClick={() => setSelectedNFT(null)}
