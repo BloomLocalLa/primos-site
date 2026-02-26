@@ -336,7 +336,13 @@ export default function Gallery() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className="fixed left-1/2 top-[55%] -translate-x-1/2 -translate-y-1/2 z-[101] bg-black border-4 border-white w-[95vw] md:w-[85vw] lg:w-[75vw] max-w-5xl h-auto max-h-[75vh]"
+                className={`fixed left-1/2 top-[55%] -translate-x-1/2 -translate-y-1/2 z-[101] bg-black border-4 w-[95vw] md:w-[85vw] lg:w-[75vw] max-w-5xl h-auto max-h-[75vh] ${
+                  selectedNFT.rarity && selectedNFT.rarity <= 100 ? 'border-primo-yellow shadow-[0_0_30px_rgba(255,215,0,0.5)]' :
+                  selectedNFT.rarity && selectedNFT.rarity <= 500 ? 'border-primo-purple shadow-[0_0_30px_rgba(155,89,182,0.5)]' :
+                  selectedNFT.rarity && selectedNFT.rarity <= 1000 ? 'border-primo-cyan shadow-[0_0_30px_rgba(0,206,209,0.5)]' :
+                  selectedNFT.rarity && selectedNFT.rarity <= 2000 ? 'border-primo-green shadow-[0_0_20px_rgba(0,255,0,0.3)]' :
+                  'border-white'
+                }`}
               >
                 <button
                   onClick={() => setSelectedNFT(null)}
@@ -363,12 +369,17 @@ export default function Gallery() {
                       <div className="flex items-center gap-3 mb-4">
                         {selectedNFT.rarity && (
                           <span className={`px-2 py-1 font-display text-xs uppercase ${
-                            selectedNFT.rarity === 'legendary' ? 'bg-primo-yellow text-black' :
-                            selectedNFT.rarity === 'epic' ? 'bg-primo-purple text-white' :
-                            selectedNFT.rarity === 'rare' ? 'bg-primo-cyan text-black' :
+                            selectedNFT.rarity <= 100 ? 'bg-primo-yellow text-black' :
+                            selectedNFT.rarity <= 500 ? 'bg-primo-purple text-white' :
+                            selectedNFT.rarity <= 1000 ? 'bg-primo-cyan text-black' :
+                            selectedNFT.rarity <= 2000 ? 'bg-primo-green text-black' :
                             'bg-static-gray text-black'
                           }`}>
-                            Rank #{selectedNFT.rarity}
+                            {selectedNFT.rarity <= 100 ? 'LEGENDARY' :
+                             selectedNFT.rarity <= 500 ? 'EPIC' :
+                             selectedNFT.rarity <= 1000 ? 'RARE' :
+                             selectedNFT.rarity <= 2000 ? 'UNCOMMON' :
+                             'COMMON'} #{selectedNFT.rarity}
                           </span>
                         )}
                         <span className="text-primo-cyan font-mono text-xl md:text-2xl">◎ {selectedNFT.price}</span>
