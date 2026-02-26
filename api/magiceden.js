@@ -25,7 +25,7 @@ export default async function handler(req, res) {
         break
       case 'listings':
         const offset = req.query.offset || 0
-        const limit = req.query.limit || 50
+        const limit = Math.min(req.query.limit || 100, 500) // Max 500 per request
         url = `${ME_API_BASE}/collections/${COLLECTION_SYMBOL}/listings?offset=${offset}&limit=${limit}`
         break
       case 'activities':
