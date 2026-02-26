@@ -52,10 +52,12 @@ export default function NFTCard({ nft, index = 0 }) {
     >
       {/* Card */}
       <div
-        className={`relative bg-black overflow-hidden ${rarity && rarity <= 500 ? 'sparkle-card' : ''}`}
+        className={`relative bg-black overflow-hidden ${
+          rarity && rarity <= 100 ? 'legendary-card' :
+          rarity && rarity <= 500 ? 'epic-card' : ''
+        }`}
         style={{
           border: `4px solid ${getBorderColor()}`,
-          boxShadow: getGlowColor()
         }}
       >
         {/* Glitch Effect on Hover */}

@@ -109,61 +109,62 @@
   100% { transform: translateX(-50%); }
 }
 
-@keyframes sparkle {
-  0%, 100% {
-    background-position: -200% center;
+/* Legendary card - Gold shimmer border effect */
+@keyframes gold-shimmer {
+  0% {
+    box-shadow: 0 0 10px #FFD700, 0 0 20px #FFD70060, 0 0 30px #FFD70030;
   }
   50% {
-    background-position: 200% center;
+    box-shadow: 0 0 20px #FFD700, 0 0 40px #FFD70080, 0 0 60px #FFD70050, 0 0 80px #FFD70030;
+  }
+  100% {
+    box-shadow: 0 0 10px #FFD700, 0 0 20px #FFD70060, 0 0 30px #FFD70030;
   }
 }
 
-@keyframes sparkle-glow {
+@keyframes gold-border-pulse {
   0%, 100% {
-    box-shadow: 0 0 15px currentColor, 0 0 30px currentColor;
+    border-color: #FFD700;
+  }
+  25% {
+    border-color: #FFF8DC;
   }
   50% {
-    box-shadow: 0 0 25px currentColor, 0 0 50px currentColor, 0 0 75px currentColor;
+    border-color: #FFEC8B;
+  }
+  75% {
+    border-color: #FFC125;
   }
 }
 
-/* Sparkle effect for Legendary and Epic cards */
-.sparkle-card {
-  position: relative;
+.legendary-card {
+  animation: gold-shimmer 2s ease-in-out infinite, gold-border-pulse 3s ease-in-out infinite;
 }
 
-.sparkle-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0) 40%,
-    rgba(255, 255, 255, 0.4) 50%,
-    rgba(255, 255, 255, 0) 60%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  animation: sparkle 3s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 20;
+/* Epic card - Purple pulse border effect */
+@keyframes purple-pulse {
+  0%, 100% {
+    box-shadow: 0 0 10px #9D4EDD, 0 0 20px #9D4EDD50;
+  }
+  50% {
+    box-shadow: 0 0 15px #9D4EDD, 0 0 30px #9D4EDD70, 0 0 45px #9D4EDD40;
+  }
 }
 
-.sparkle-card::after {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  border-radius: inherit;
-  animation: sparkle-glow 2s ease-in-out infinite;
-  pointer-events: none;
-  z-index: -1;
+@keyframes purple-border-shift {
+  0%, 100% {
+    border-color: #9D4EDD;
+  }
+  33% {
+    border-color: #BA55D3;
+  }
+  66% {
+    border-color: #8B008B;
+  }
+}
+
+.epic-card {
+  animation: purple-pulse 1.5s ease-in-out infinite, purple-border-shift 4s ease-in-out infinite;
 }
 
 @keyframes float {
