@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import NFTCard from '../components/NFTCard'
 import GlitchText from '../components/GlitchText'
-import { getListedNFTs, lamportsToSol, getMagicEdenUrl } from '../lib/magiceden'
+import { getListedNFTs, getCollectionStats, getMagicEdenUrl } from '../lib/magiceden'
 
 const filterOptions = {
   background: ['All', 'Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'],
@@ -23,8 +23,6 @@ export default function Gallery() {
   const [filters, setFilters] = useState({
     background: 'All',
   })
-  const [hasMore, setHasMore] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
 
   // Fetch NFTs from Magic Eden on mount
   useEffect(() => {
@@ -34,12 +32,16 @@ export default function Gallery() {
   const fetchNFTs = async () => {
     setLoading(true)
     try {
-      // Fetch multiple batches to get more listings
+      // First get total count
+      const stats = await getCollectionStats()
+      const totalListed = stats.listedCount || 400
+
+      // Fetch ALL listings in batches
       const batchSize = 100
-      const batches = 4 // Get up to 400 NFTs
+      const totalBatches = Math.ceil(totalListed / batchSize)
       let allListings = []
 
-      for (let i = 0; i < batches; i++) {
+      for (let i = 0; i < totalBatches; i++) {
         const listings = await getListedNFTs(i * batchSize, batchSize)
         if (listings.length === 0) break
         allListings = [...allListings, ...listings]
@@ -50,43 +52,17 @@ export default function Gallery() {
         id: listing.tokenMint || index + 1,
         name: listing.token?.name || `Primo #${index}`,
         image: listing.token?.image || '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif',
-        price: lamportsToSol(listing.price || 0),
+        price: listing.price || 0, // Price is already in SOL from API
         attributes: listing.token?.attributes || [],
         mintAddress: listing.tokenMint || listing.token?.mintAddress,
         rarity: listing.rarity?.meInstant?.rank || null,
       }))
       setNfts(formattedNFTs)
-      setHasMore(allListings.length >= batches * batchSize)
+      setHasMore(false) // We fetched all
     } catch (error) {
       console.error('Failed to fetch NFTs:', error)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const loadMore = async () => {
-    setLoadingMore(true)
-    try {
-      const listings = await getListedNFTs(nfts.length, 100)
-      if (listings.length === 0) {
-        setHasMore(false)
-        return
-      }
-      const newNFTs = listings.map((listing, index) => ({
-        id: listing.tokenMint || nfts.length + index + 1,
-        name: listing.token?.name || `Primo #${nfts.length + index}`,
-        image: listing.token?.image || '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif',
-        price: lamportsToSol(listing.price || 0),
-        attributes: listing.token?.attributes || [],
-        mintAddress: listing.tokenMint || listing.token?.mintAddress,
-        rarity: listing.rarity?.meInstant?.rank || null,
-      }))
-      setNfts([...nfts, ...newNFTs])
-      setHasMore(listings.length === 100)
-    } catch (error) {
-      console.error('Failed to load more NFTs:', error)
-    } finally {
-      setLoadingMore(false)
     }
   }
 
@@ -101,9 +77,11 @@ export default function Gallery() {
     .sort((a, b) => {
       switch (sortOrder) {
         case 'price-asc':
-          return parseFloat(a.price) - parseFloat(b.price)
+          return a.price - b.price
         case 'price-desc':
-          return parseFloat(b.price) - parseFloat(a.price)
+          return b.price - a.price
+        case 'rarity':
+          return (a.rarity || 9999) - (b.rarity || 9999)
         default:
           return 0
       }
@@ -285,28 +263,6 @@ export default function Gallery() {
                 <NFTCard nft={nft} index={index} />
               </div>
             ))}
-          </div>
-        )}
-
-        {/* Load More Button */}
-        {!loading && hasMore && filteredNFTs.length > 0 && (
-          <div className="text-center mt-12">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={loadMore}
-              disabled={loadingMore}
-              className="px-8 py-4 bg-black border-4 border-primo-pink text-white font-display tracking-wider hover:bg-primo-pink hover:text-black transition-all disabled:opacity-50"
-            >
-              {loadingMore ? (
-                <span className="flex items-center gap-2">
-                  <RefreshCw size={20} className="animate-spin" />
-                  LOADING...
-                </span>
-              ) : (
-                'LOAD MORE PRIMOS'
-              )}
-            </motion.button>
           </div>
         )}
 
