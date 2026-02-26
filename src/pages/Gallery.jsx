@@ -336,70 +336,76 @@ export default function Gallery() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className="fixed inset-4 md:inset-20 z-50 bg-black border-4 border-white overflow-auto"
+                className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-black border-4 border-white w-[95vw] md:w-[85vw] lg:w-[75vw] max-w-5xl h-auto max-h-[85vh]"
               >
                 <button
                   onClick={() => setSelectedNFT(null)}
-                  className="absolute top-4 right-4 p-2 text-white hover:text-primo-pink transition-colors z-10"
+                  className="absolute top-2 right-2 p-2 text-white hover:text-primo-pink transition-colors z-10"
                 >
-                  <X size={32} />
+                  <X size={28} />
                 </button>
 
-                <div className="grid md:grid-cols-2 min-h-full">
+                <div className="grid md:grid-cols-2 h-full">
                   {/* Image */}
-                  <div className="relative aspect-square md:aspect-auto">
+                  <div className="relative h-[250px] md:h-full md:max-h-[85vh]">
                     <img
                       src={selectedNFT.image}
                       alt={selectedNFT.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain md:object-cover"
                     />
                   </div>
 
                   {/* Info */}
-                  <div className="p-8">
-                    <h2 className="font-display text-4xl text-white mb-2">{selectedNFT.name}</h2>
-
-                    <div className="flex items-center gap-4 mb-8">
-                      <span className={`px-3 py-1 font-display text-sm uppercase ${
-                        selectedNFT.rarity === 'legendary' ? 'bg-primo-yellow text-black' :
-                        selectedNFT.rarity === 'epic' ? 'bg-primo-purple text-white' :
-                        selectedNFT.rarity === 'rare' ? 'bg-primo-cyan text-black' :
-                        'bg-static-gray text-black'
-                      }`}>
-                        {selectedNFT.rarity}
-                      </span>
-                      <span className="text-primo-cyan font-mono text-2xl">◎ {selectedNFT.price}</span>
-                    </div>
-
-                    {/* Attributes */}
-                    <div className="mb-8">
-                      <h3 className="font-display text-white mb-4">ATTRIBUTES</h3>
-                      <div className="grid grid-cols-2 gap-3">
-                        {selectedNFT.attributes.map((attr, i) => (
-                          <div
-                            key={i}
-                            className="p-3 bg-static-dark border border-static-gray"
-                          >
-                            <div className="text-static-gray text-xs font-mono mb-1">
-                              {attr.trait_type}
-                            </div>
-                            <div className="text-white font-display">{attr.value}</div>
-                          </div>
-                        ))}
+                  <div className="p-4 md:p-6 flex flex-col h-full max-h-[50vh] md:max-h-[85vh] overflow-hidden">
+                    {/* Header - Fixed */}
+                    <div className="flex-shrink-0">
+                      <h2 className="font-display text-2xl md:text-3xl text-white mb-2">{selectedNFT.name}</h2>
+                      <div className="flex items-center gap-3 mb-4">
+                        {selectedNFT.rarity && (
+                          <span className={`px-2 py-1 font-display text-xs uppercase ${
+                            selectedNFT.rarity === 'legendary' ? 'bg-primo-yellow text-black' :
+                            selectedNFT.rarity === 'epic' ? 'bg-primo-purple text-white' :
+                            selectedNFT.rarity === 'rare' ? 'bg-primo-cyan text-black' :
+                            'bg-static-gray text-black'
+                          }`}>
+                            Rank #{selectedNFT.rarity}
+                          </span>
+                        )}
+                        <span className="text-primo-cyan font-mono text-xl md:text-2xl">◎ {selectedNFT.price}</span>
                       </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="space-y-3">
+                    {/* Attributes - Scrollable */}
+                    {selectedNFT.attributes && selectedNFT.attributes.length > 0 && (
+                      <div className="flex-1 overflow-y-auto mb-4 min-h-0">
+                        <h3 className="font-display text-white text-sm mb-2 sticky top-0 bg-black py-1">ATTRIBUTES</h3>
+                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+                          {selectedNFT.attributes.map((attr, i) => (
+                            <div
+                              key={i}
+                              className="p-2 bg-static-dark border border-static-gray"
+                            >
+                              <div className="text-static-gray text-[10px] font-mono">
+                                {attr.trait_type}
+                              </div>
+                              <div className="text-white font-display text-sm truncate">{attr.value}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Actions - Fixed at bottom */}
+                    <div className="flex-shrink-0 mt-auto">
                       <motion.a
                         href={`https://magiceden.io/item-details/${selectedNFT.mintAddress}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        className="w-full py-4 bg-gradient-to-r from-primo-pink to-primo-purple text-white font-display tracking-wider flex items-center justify-center gap-2 border-2 border-white"
+                        className="w-full py-3 bg-gradient-to-r from-primo-pink to-primo-purple text-white font-display tracking-wider flex items-center justify-center gap-2 border-2 border-white text-sm md:text-base"
                       >
-                        <ExternalLink size={20} />
+                        <ExternalLink size={18} />
                         BUY ON MAGIC EDEN
                       </motion.a>
                     </div>
