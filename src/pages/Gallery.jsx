@@ -216,23 +216,39 @@ export default function Gallery() {
           Showing {filteredNFTs.length} of {nfts.length} Primos
         </div>
 
-        {/* NFT Grid */}
-        <div
-          className={`grid gap-6 ${
-            gridSize === 'large'
-              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-              : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
-          }`}
-        >
-          {filteredNFTs.map((nft, index) => (
-            <div key={nft.id} onClick={() => setSelectedNFT(nft)} className="cursor-pointer">
-              <NFTCard nft={nft} index={index} />
+        {/* Loading State */}
+        {loading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-20"
+          >
+            <div className="inline-block">
+              <RefreshCw size={48} className="animate-spin text-primo-pink mx-auto mb-4" />
             </div>
-          ))}
-        </div>
+            <p className="text-static-gray font-mono">Loading Primos from Magic Eden...</p>
+          </motion.div>
+        )}
+
+        {/* NFT Grid */}
+        {!loading && (
+          <div
+            className={`grid gap-6 ${
+              gridSize === 'large'
+                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
+            }`}
+          >
+            {filteredNFTs.map((nft, index) => (
+              <div key={nft.id} onClick={() => setSelectedNFT(nft)} className="cursor-pointer">
+                <NFTCard nft={nft} index={index} />
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Empty State */}
-        {filteredNFTs.length === 0 && (
+        {!loading && filteredNFTs.length === 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

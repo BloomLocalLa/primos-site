@@ -1,7 +1,8 @@
 // Magic Eden API Service for Primos NFT Collection
+// Uses Vercel serverless function as proxy to avoid CORS issues
 
-const ME_API_BASE = 'https://api-mainnet.magiceden.dev/v2'
-const COLLECTION_SYMBOL = 'primos' // Update with actual collection symbol
+// Use relative path for the API proxy (works on both localhost and production)
+const API_PROXY = '/api/magiceden'
 
 // Cache for API responses
 const cache = new Map()
@@ -26,9 +27,7 @@ export async function getCollectionStats() {
   if (cached) return cached
 
   try {
-    const response = await fetch(
-      `${ME_API_BASE}/collections/${COLLECTION_SYMBOL}/stats`
-    )
+    const response = await fetch(`${API_PROXY}?endpoint=stats`)
 
     if (!response.ok) throw new Error('Failed to fetch collection stats')
 
@@ -39,24 +38,24 @@ export async function getCollectionStats() {
     console.error('Error fetching collection stats:', error)
     // Return fallback data
     return {
-      symbol: COLLECTION_SYMBOL,
-      floorPrice: 0.5 * 1e9, // In lamports
-      listedCount: 100,
-      volumeAll: 2500 * 1e9,
-      avgPrice24hr: 0.8 * 1e9,
+      symbol: 'primos',
+      floorPrice: 16000000, // 0.016 SOL in lamports
+      listedCount: 366,
+      volumeAll: 798000000000,
+      avgPrice24hr: 20000000,
     }
   }
 }
 
 // Fetch listed NFTs
-export async function getListedNFTs(offset = 0, limit = 20) {
+export async function getListedNFTs(offset = 0, limit = 50) {
   const cacheKey = `listed-${offset}-${limit}`
   const cached = getCached(cacheKey)
   if (cached) return cached
 
   try {
     const response = await fetch(
-      `${ME_API_BASE}/collections/${COLLECTION_SYMBOL}/listings?offset=${offset}&limit=${limit}`
+      `${API_PROXY}?endpoint=listings&offset=${offset}&limit=${limit}`
     )
 
     if (!response.ok) throw new Error('Failed to fetch listings')
@@ -78,7 +77,7 @@ export async function getRecentActivities(limit = 10) {
 
   try {
     const response = await fetch(
-      `${ME_API_BASE}/collections/${COLLECTION_SYMBOL}/activities?offset=0&limit=${limit}`
+      `${API_PROXY}?endpoint=activities&limit=${limit}`
     )
 
     if (!response.ok) throw new Error('Failed to fetch activities')
@@ -92,55 +91,9 @@ export async function getRecentActivities(limit = 10) {
   }
 }
 
-// Fetch single NFT details
-export async function getNFTDetails(mintAddress) {
-  const cacheKey = `nft-${mintAddress}`
-  const cached = getCached(cacheKey)
-  if (cached) return cached
-
-  try {
-    const response = await fetch(
-      `${ME_API_BASE}/tokens/${mintAddress}`
-    )
-
-    if (!response.ok) throw new Error('Failed to fetch NFT details')
-
-    const data = await response.json()
-    setCache(cacheKey, data)
-    return data
-  } catch (error) {
-    console.error('Error fetching NFT details:', error)
-    return null
-  }
-}
-
-// Search NFTs by attributes
-export async function searchByAttributes(attributes = {}) {
-  try {
-    const queryParams = new URLSearchParams()
-
-    Object.entries(attributes).forEach(([key, value]) => {
-      if (value && value !== 'All') {
-        queryParams.append(`attributes[${key}]`, value)
-      }
-    })
-
-    const response = await fetch(
-      `${ME_API_BASE}/collections/${COLLECTION_SYMBOL}/listings?${queryParams.toString()}`
-    )
-
-    if (!response.ok) throw new Error('Failed to search NFTs')
-
-    return await response.json()
-  } catch (error) {
-    console.error('Error searching NFTs:', error)
-    return []
-  }
-}
-
 // Format lamports to SOL
 export function lamportsToSol(lamports) {
-  return (lamports / 1e9).toFixed(2)
+  return (lamports / 1e9).toFixed(3)
 }
 
 // Get Magic Eden listing URL
@@ -150,5 +103,5 @@ export function getMagicEdenUrl(mintAddress) {
 
 // Get collection URL
 export function getCollectionUrl() {
-  return `https://magiceden.io/marketplace/${COLLECTION_SYMBOL}`
+  return `https://magiceden.io/marketplace/primos`
 }
