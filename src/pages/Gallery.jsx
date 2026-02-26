@@ -90,14 +90,20 @@ export default function Gallery() {
       // Extract rarity rank - ensure it's a number
       const rarityRank = listing.rarity?.meInstant?.rank
 
+      // Convert IPFS URLs to HTTP gateway
+      let imageUrl = listing.token?.image || '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif'
+      if (imageUrl.startsWith('ipfs://')) {
+        imageUrl = imageUrl.replace('ipfs://', 'https://nftstorage.link/ipfs/')
+      }
+
       return {
         id: listing.tokenMint || index + 1,
         name: listing.token?.name || `Primo #${index}`,
-        image: listing.token?.image || '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif',
+        image: imageUrl,
         price: listing.price || 0,
         attributes: listing.token?.attributes || [],
         mintAddress: listing.tokenMint || listing.token?.mintAddress,
-        rarity: typeof rarityRank === 'number' ? rarityRank : (rarityRank ? parseInt(rarityRank, 10) : null),
+        rarity: typeof rarityRank === 'number' && !isNaN(rarityRank) ? rarityRank : (rarityRank ? parseInt(rarityRank, 10) || null : null),
       }
     })
   }
@@ -118,14 +124,14 @@ export default function Gallery() {
           return b.price - a.price
         case 'rarity':
           // Put NFTs without rarity at the very bottom
-          const aHasRarity = a.rarity !== null && a.rarity !== undefined
-          const bHasRarity = b.rarity !== null && b.rarity !== undefined
+          const aRarity = typeof a.rarity === 'number' && !isNaN(a.rarity) ? a.rarity : null
+          const bRarity = typeof b.rarity === 'number' && !isNaN(b.rarity) ? b.rarity : null
 
-          if (!aHasRarity && !bHasRarity) return 0 // Both no rarity, keep order
-          if (!aHasRarity) return 1 // a has no rarity, put after b
-          if (!bHasRarity) return -1 // b has no rarity, put after a
+          if (aRarity === null && bRarity === null) return 0
+          if (aRarity === null) return 1
+          if (bRarity === null) return -1
 
-          return a.rarity - b.rarity // Both have rarity, lower rank = rarer = first
+          return aRarity - bRarity
         default:
           return 0
       }
@@ -303,7 +309,7 @@ export default function Gallery() {
             }`}
           >
             {filteredNFTs.map((nft, index) => (
-              <div key={nft.id} onClick={() => setSelectedNFT(nft)} className="cursor-pointer">
+              <div key={`${nft.mintAddress}-${index}`} onClick={() => setSelectedNFT(nft)} className="cursor-pointer">
                 <NFTCard nft={nft} index={index} />
               </div>
             ))}

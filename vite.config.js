@@ -22,6 +22,8 @@ export default defineConfig({
             return `/collections/primos/listings?offset=${offset}&limit=${limit}`
           } else if (endpoint === 'activities') {
             return `/collections/primos/activities?offset=0&limit=${limit}`
+          } else if (endpoint === 'amm-pools') {
+            return '/mmm/pools?collectionSymbol=primos'
           }
           return path
         },
