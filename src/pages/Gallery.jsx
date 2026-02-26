@@ -345,18 +345,18 @@ export default function Gallery() {
                   <X size={28} />
                 </button>
 
-                <div className="grid md:grid-cols-2 h-full">
+                <div className="grid md:grid-cols-2 h-full max-h-[75vh] overflow-hidden">
                   {/* Image */}
-                  <div className="relative h-[250px] md:h-full md:max-h-[85vh]">
+                  <div className="relative h-[200px] md:h-full overflow-hidden">
                     <img
                       src={selectedNFT.image}
                       alt={selectedNFT.name}
-                      className="w-full h-full object-contain md:object-cover"
+                      className="w-full h-full object-contain"
                     />
                   </div>
 
                   {/* Info */}
-                  <div className="p-4 md:p-6 flex flex-col h-full max-h-[50vh] md:max-h-[85vh] overflow-hidden">
+                  <div className="p-4 md:p-6 flex flex-col h-full max-h-[75vh] overflow-hidden">
                     {/* Header - Fixed */}
                     <div className="flex-shrink-0">
                       <h2 className="font-display text-2xl md:text-3xl text-white mb-2">{selectedNFT.name}</h2>
