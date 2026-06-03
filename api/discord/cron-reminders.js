@@ -5,7 +5,7 @@ import { createClient } from '@supabase/supabase-js'
 
 export default async function handler(req, res) {
   const config = loadConfig()
-  if (!isCronAuthorized(req.headers, config.CRON_SECRET, req.query)) {
+  if (!isCronAuthorized(req.headers, config.CRON_SECRET)) {
     return res.status(401).json({ error: 'unauthorized' })
   }
   try {
