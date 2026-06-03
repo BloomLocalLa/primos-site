@@ -3,20 +3,10 @@ import { Link } from 'react-router-dom'
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion'
 import {
   Zap, Users, ShoppingBag, Palette, MessageCircle,
-  ChevronDown, Sparkles, Eye, ArrowRight, Twitter, Headphones, Glasses, HardHat
+  ChevronDown, Sparkles, Eye, ArrowRight, Twitter
 } from 'lucide-react'
 import GlitchText from '../components/GlitchText'
-import { getCollectionStats, lamportsToSol } from '../lib/magiceden'
-
-// Featured NFTs - actual Primos artwork
-const featuredNFTs = [
-  { id: 1, name: 'Primo #1234', image: '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif', price: 2.5, bg: 'bg-pink-dark' },
-  { id: 2, name: 'Primo #5678', image: '/artwork/QmagjfWJXmrStQP7sYsEqytPV2yXtyRhKTcT3Ngqw8D1MA.avif', price: 3.2, bg: 'bg-teal-dark' },
-  { id: 3, name: 'Primo #9012', image: '/artwork/QmamhGh1LjF6tTdWZerkVQjtQVkcThminw57MB3RgU9JVc.avif', price: 1.8, bg: 'bg-purple-900' },
-  { id: 4, name: 'Primo #3456', image: '/artwork/QmaXp9riawoo7HMUmZC3SxCPVxTxytGgsoAtCHfT65DFxK.avif', price: 4.1, bg: 'bg-pink-dark' },
-  { id: 5, name: 'Primo #7890', image: '/artwork/QmbEf76maCZRCUEB8ddGQHHP4iDpr5bPY5aCk25KjRYvSn.avif', price: 2.9, bg: 'bg-teal-dark' },
-  { id: 6, name: 'Primo #2345', image: '/artwork/QmbR2gsdtid7y3DLZ7ZmDxPs2XWhpX4sTnh5sRnKJbrC5g.avif', price: 3.7, bg: 'bg-blue-900' },
-]
+import { getCollectionStats, getRecentActivities, getListedNFTs, lamportsToSol } from '../lib/magiceden'
 
 // Default stats (will be updated with live data)
 const defaultStats = [
@@ -26,15 +16,6 @@ const defaultStats = [
   { label: 'VOLUME', value: '◎ --', key: 'volume' },
 ]
 
-const traits = [
-  { name: 'HOODS', count: '2,746', image: '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif' },
-  { name: 'SUNGLASSES', count: '1,842', image: '/artwork/QmagjfWJXmrStQP7sYsEqytPV2yXtyRhKTcT3Ngqw8D1MA.avif' },
-  { name: 'HARD HATS', count: '423', image: '/artwork/QmamhGh1LjF6tTdWZerkVQjtQVkcThminw57MB3RgU9JVc.avif' },
-  { name: 'HEADPHONES', count: '687', image: '/artwork/QmaXp9riawoo7HMUmZC3SxCPVxTxytGgsoAtCHfT65DFxK.avif' },
-  { name: 'BACKGROUNDS', count: '12', image: '/artwork/QmbEf76maCZRCUEB8ddGQHHP4iDpr5bPY5aCk25KjRYvSn.avif' },
-  { name: 'EXPRESSIONS', count: '8', image: '/artwork/QmbR2gsdtid7y3DLZ7ZmDxPs2XWhpX4sTnh5sRnKJbrC5g.avif' },
-]
-
 const quickLinks = [
   { label: 'GALLERY', path: '/gallery', icon: Eye, desc: 'Browse all 2,746 Primos' },
   { label: 'MERCH', path: '/merch', icon: ShoppingBag, desc: 'Rep your Primo' },
@@ -42,9 +23,27 @@ const quickLinks = [
   { label: 'ARTWORK', path: '/artwork', icon: Palette, desc: 'Get custom art' },
 ]
 
+// Fallback featured NFTs using local artwork
+const fallbackFeatured = [
+  { id: '1', name: 'Primo #1', image: '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif', price: 0.016, rarity: 245 },
+  { id: '2', name: 'Primo #2', image: '/artwork/QmagjfWJXmrStQP7sYsEqytPV2yXtyRhKTcT3Ngqw8D1MA.avif', price: 0.018, rarity: 512 },
+  { id: '3', name: 'Primo #3', image: '/artwork/QmamhGh1LjF6tTdWZerkVQjtQVkcThminw57MB3RgU9JVc.avif', price: 0.02, rarity: 89 },
+  { id: '4', name: 'Primo #4', image: '/artwork/QmaXp9riawoo7HMUmZC3SxCPVxTxytGgsoAtCHfT65DFxK.avif', price: 0.022, rarity: 1205 },
+  { id: '5', name: 'Primo #5', image: '/artwork/QmbEf76maCZRCUEB8ddGQHHP4iDpr5bPY5aCk25KjRYvSn.avif', price: 0.019, rarity: 678 },
+  { id: '6', name: 'Primo #6', image: '/artwork/QmbR2gsdtid7y3DLZ7ZmDxPs2XWhpX4sTnh5sRnKJbrC5g.avif', price: 0.025, rarity: 156 },
+  { id: '7', name: 'Primo #7', image: '/artwork/QmcjHTh9pyhzSieqCDx5xTu48oUkYvVsHega2LrrDzuUUj.avif', price: 0.017, rarity: 923 },
+  { id: '8', name: 'Primo #8', image: '/artwork/QmdgfUXRHpMHF2cDXS3tM6tedErmD41PkmkP2KpdCUn9LZ.avif', price: 0.021, rarity: 1567 },
+]
+
 export default function Home() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const [stats, setStats] = useState(defaultStats)
+  const [floorPrice, setFloorPrice] = useState(0)
+  const [recentSales, setRecentSales] = useState([])
+  const [chartsLoading, setChartsLoading] = useState(true)
+  const [bestDeals, setBestDeals] = useState([]) // Rare NFTs at good prices
+  const [lowestListings, setLowestListings] = useState([]) // Cheapest NFTs
+  const [featuredListings, setFeaturedListings] = useState([]) // For carousel
   const heroRef = useRef(null)
   const statsRef = useRef(null)
   const traitsRef = useRef(null)
@@ -55,26 +54,108 @@ export default function Home() {
   const heroY = useTransform(scrollYProgress, [0, 0.3], [0, -150])
   const heroOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0])
 
-  // Fetch live stats from Magic Eden
+  // Fetch live stats, listings, and activities from Magic Eden
   useEffect(() => {
-    async function fetchStats() {
+    async function fetchAllData() {
       try {
-        const data = await getCollectionStats()
-        const floorSol = lamportsToSol(data.floorPrice || 0)
-        const volumeSol = (data.volumeAll / 1e9).toFixed(0)
+        // Fetch stats, listings, and activities in parallel
+        const [statsData, listings, activities] = await Promise.all([
+          getCollectionStats(),
+          getListedNFTs(0, 200),
+          getRecentActivities(100),
+        ])
 
+        // Update main stats
+        const floorSol = parseFloat(lamportsToSol(statsData.floorPrice || 0))
+        const volumeSol = (statsData.volumeAll / 1e9).toFixed(0)
+        setFloorPrice(floorSol)
         setStats([
           { label: 'SUPPLY', value: '2,746', key: 'supply' },
           { label: 'FLOOR', value: `◎ ${floorSol}`, key: 'floor' },
-          { label: 'LISTED', value: data.listedCount?.toLocaleString() || '--', key: 'listed' },
+          { label: 'LISTED', value: statsData.listedCount?.toLocaleString() || '--', key: 'listed' },
           { label: 'VOLUME', value: `◎ ${volumeSol}`, key: 'volume' },
         ])
+
+        // Process listings for best deals and featured
+        const processedListings = listings.map(listing => {
+          const rarityRank = listing.rarity?.meInstant?.rank
+          let imageUrl = listing.token?.image || '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif'
+          if (imageUrl.startsWith('ipfs://')) {
+            imageUrl = imageUrl.replace('ipfs://', 'https://nftstorage.link/ipfs/')
+          }
+
+          return {
+            id: listing.tokenMint,
+            name: listing.token?.name || 'Primo',
+            image: imageUrl,
+            price: listing.price || 0,
+            rarity: typeof rarityRank === 'number' ? rarityRank : (rarityRank ? parseInt(rarityRank, 10) : null),
+            mintAddress: listing.tokenMint,
+            attributes: listing.token?.attributes || [],
+          }
+        })
+
+        // Best Deals: Rare NFTs (rank <= 1000) sorted by price
+        const rareDeals = processedListings
+          .filter(nft => nft.rarity && nft.rarity <= 1000)
+          .sort((a, b) => a.price - b.price)
+          .slice(0, 6)
+        setBestDeals(rareDeals)
+
+        // Lowest Listings: Cheapest NFTs
+        const cheapest = [...processedListings]
+          .sort((a, b) => a.price - b.price)
+          .slice(0, 10)
+        setLowestListings(cheapest)
+
+        // Featured: Mix of rare deals and some variety
+        const featured = []
+        // Add top rare deals
+        rareDeals.slice(0, 3).forEach(nft => featured.push(nft))
+        // Add some cheapest that aren't already included
+        cheapest.forEach(nft => {
+          if (featured.length < 8 && !featured.find(f => f.id === nft.id)) {
+            featured.push(nft)
+          }
+        })
+        // Fill with random listings if needed
+        processedListings.forEach(nft => {
+          if (featured.length < 8 && !featured.find(f => f.id === nft.id)) {
+            featured.push(nft)
+          }
+        })
+        setFeaturedListings(featured)
+
+        // Process recent sales for the list
+        const sales = activities
+          .filter(a => a.type === 'buyNow' || a.type === 'bid_won')
+          .slice(0, 20)
+          .map((sale, i) => ({
+            id: i,
+            name: sale.tokenMint?.slice(0, 8) + '...',
+            price: (sale.price / 1e9).toFixed(3),
+            time: new Date(sale.blockTime * 1000).toLocaleTimeString(),
+            buyer: sale.buyer?.slice(0, 4) + '...' + sale.buyer?.slice(-4),
+          }))
+        setRecentSales(sales)
+
       } catch (error) {
-        console.error('Failed to fetch stats:', error)
+        console.error('Failed to fetch data:', error)
+        // Use fallback data on error
+        setFeaturedListings(fallbackFeatured)
+        setLowestListings(fallbackFeatured.slice(0, 4))
+        setBestDeals(fallbackFeatured.filter(nft => nft.rarity <= 1000).slice(0, 6))
+      } finally {
+        setChartsLoading(false)
       }
     }
-    fetchStats()
+    fetchAllData()
   }, [])
+
+  // Use fallback if no data loaded
+  const displayFeatured = featuredListings.length > 0 ? featuredListings : fallbackFeatured
+  const displayFloating = lowestListings.length > 0 ? lowestListings : fallbackFeatured.slice(0, 4)
+  const displayBestDeals = bestDeals.length > 0 ? bestDeals : fallbackFeatured.filter(nft => nft.rarity <= 1000).slice(0, 6)
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -249,7 +330,7 @@ export default function Home() {
             </motion.a>
 
             <motion.a
-              href="https://discord.gg/primos"
+              href="https://discord.gg/XhCcZNfEVn"
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ scale: 1.05, y: -3 }}
@@ -279,10 +360,13 @@ export default function Home() {
         </div>
 
         {/* Floating NFTs */}
-        {featuredNFTs.slice(0, 4).map((nft, i) => (
-          <motion.div
+        {displayFloating.slice(0, 4).map((nft, i) => (
+          <motion.a
             key={nft.id}
-            className="absolute hidden lg:block"
+            href={nft.mintAddress ? `https://magiceden.io/item-details/${nft.mintAddress}` : 'https://magiceden.io/marketplace/primos'}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute hidden lg:block cursor-pointer"
             initial={{ opacity: 0, scale: 0 }}
             animate={{
               opacity: 0.85,
@@ -301,100 +385,241 @@ export default function Home() {
               right: i >= 2 ? '5%' : 'auto',
             }}
           >
-            <div className="w-24 h-24 md:w-32 md:h-32 border-3 border-white bg-black overflow-hidden shadow-xl">
+            <div
+              className="w-24 h-24 md:w-32 md:h-32 bg-black overflow-hidden relative"
+              style={{
+                border: `3px solid ${
+                  nft.rarity && nft.rarity <= 100 ? '#FFD700' :
+                  nft.rarity && nft.rarity <= 500 ? '#9D4EDD' :
+                  nft.rarity && nft.rarity <= 1000 ? '#00CED1' :
+                  nft.rarity && nft.rarity <= 2000 ? '#32CD32' :
+                  '#FFFFFF'
+                }`,
+                boxShadow:
+                  nft.rarity && nft.rarity <= 100 ? '0 0 20px rgba(255,215,0,0.5)' :
+                  nft.rarity && nft.rarity <= 500 ? '0 0 20px rgba(157,78,221,0.5)' :
+                  nft.rarity && nft.rarity <= 1000 ? '0 0 15px rgba(0,206,209,0.4)' :
+                  nft.rarity && nft.rarity <= 2000 ? '0 0 10px rgba(50,205,50,0.3)' :
+                  '0 0 10px rgba(255,255,255,0.2)'
+              }}
+            >
               <img src={nft.image} alt={nft.name} className="w-full h-full object-cover" />
+              <div className="absolute bottom-0 left-0 right-0 bg-black/80 text-center py-1">
+                <span className="text-primo-cyan text-xs font-mono">◎ {nft.price.toFixed(2)}</span>
+              </div>
             </div>
-          </motion.div>
+          </motion.a>
         ))}
       </motion.section>
 
       {/* STATS */}
-      <section ref={statsRef} className="py-8 bg-white/90 backdrop-blur-sm">
+      <section ref={statsRef} className="py-4 md:py-8 bg-white/90 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="grid grid-cols-4 divide-x divide-black/10">
+          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-black/10">
             {stats.map((stat, index) => (
               <motion.div
                 key={stat.label}
                 initial={{ opacity: 0, y: 20 }}
                 animate={isStatsInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: index * 0.1 }}
-                className="text-center py-6"
+                className="text-center py-3 md:py-6"
               >
-                <div className="font-display text-3xl md:text-5xl text-black">{stat.value}</div>
-                <div className="text-black/50 text-xs md:text-sm font-mono mt-1">{stat.label}</div>
+                <div className="font-display text-xl md:text-5xl text-black">{stat.value}</div>
+                <div className="text-black/50 text-[10px] md:text-sm font-mono mt-0.5 md:mt-1">{stat.label}</div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* TRAITS SECTION */}
-      <section ref={traitsRef} className="py-20 bg-black/70 backdrop-blur-sm relative overflow-hidden">
+      {/* CHARTS SECTION */}
+      <section ref={traitsRef} className="py-12 md:py-20 bg-black/70 backdrop-blur-sm relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primo-pink/5 to-transparent" />
 
-        <div className="max-w-6xl mx-auto px-4 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
+            className="text-center mb-8 md:mb-12"
           >
-            <h2 className="font-display text-4xl md:text-6xl text-white mb-4">
-              TRAITS
+            <h2 className="font-display text-3xl md:text-6xl text-white mb-2 md:mb-4">
+              <GlitchText text="ANALYTICS" />
             </h2>
-            <p className="text-white/50 font-mono">Each Primo is unique</p>
+            <p className="text-white/50 font-mono text-sm md:text-base">Real-time collection data</p>
           </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {traits.map((trait, index) => (
-              <motion.div
-                key={trait.name}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={isTraitsInView ? { opacity: 1, scale: 1 } : {}}
-                transition={{ delay: index * 0.08 }}
-                whileHover={{ scale: 1.08, y: -8 }}
-                className="group cursor-pointer"
-              >
-                <div className="relative bg-black border-2 border-white/20 overflow-hidden group-hover:border-primo-pink transition-colors">
-                  {/* Image */}
-                  <div className="aspect-square overflow-hidden">
-                    <img
-                      src={trait.image}
-                      alt={trait.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    {/* Overlay gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+          {/* Best Deals Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+            {/* Best Deals - Rare NFTs at Good Prices */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              className="bg-black/50 border-2 border-primo-yellow/50 p-3 md:p-6"
+            >
+              <div className="flex items-center justify-between mb-3 md:mb-4">
+                <h3 className="font-display text-base md:text-xl text-white flex items-center gap-2">
+                  <Sparkles size={16} className="text-primo-yellow md:w-5 md:h-5" />
+                  BEST DEALS
+                </h3>
+                <span className="text-primo-yellow text-[10px] md:text-xs font-mono hidden sm:inline">Rare NFTs • Low Prices</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 md:gap-3">
+                {chartsLoading ? (
+                  <div className="col-span-3 flex items-center justify-center h-48">
+                    <div className="text-white/50 font-mono">Loading...</div>
                   </div>
-
-                  {/* Info overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 p-3 text-center">
-                    <div className="font-display text-white text-sm tracking-wider">{trait.name}</div>
-                    <div className="font-mono text-primo-cyan text-xs">{trait.count}</div>
+                ) : displayBestDeals.length > 0 ? (
+                  displayBestDeals.map((nft, i) => (
+                    <motion.a
+                      key={nft.id}
+                      href={nft.mintAddress ? `https://magiceden.io/item-details/${nft.mintAddress}` : 'https://magiceden.io/marketplace/primos'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.05 }}
+                      whileHover={{ scale: 1.05, y: -5 }}
+                      className="group relative bg-black overflow-hidden"
+                      style={{
+                        border: `2px solid ${
+                          nft.rarity && nft.rarity <= 100 ? '#FFD700' :
+                          nft.rarity && nft.rarity <= 500 ? '#9D4EDD' :
+                          nft.rarity && nft.rarity <= 1000 ? '#00CED1' :
+                          nft.rarity && nft.rarity <= 2000 ? '#32CD32' :
+                          '#FFFFFF'
+                        }`,
+                        boxShadow:
+                          nft.rarity && nft.rarity <= 100 ? '0 0 15px rgba(255,215,0,0.3)' :
+                          nft.rarity && nft.rarity <= 500 ? '0 0 15px rgba(157,78,221,0.3)' :
+                          nft.rarity && nft.rarity <= 1000 ? '0 0 10px rgba(0,206,209,0.2)' :
+                          'none'
+                      }}
+                    >
+                      <div className="aspect-square overflow-hidden">
+                        <img src={nft.image} alt={nft.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                      </div>
+                      {/* Rarity Badge */}
+                      {nft.rarity && (
+                        <div className={`absolute top-1 right-1 px-1.5 py-0.5 text-[10px] font-display ${
+                          nft.rarity <= 100 ? 'bg-[#FFD700] text-black' :
+                          nft.rarity <= 500 ? 'bg-[#9D4EDD] text-white' :
+                          'bg-[#00CED1] text-black'
+                        }`}>
+                          #{nft.rarity}
+                        </div>
+                      )}
+                      {/* Price */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/90 px-2 py-1.5">
+                        <div className="font-display text-primo-cyan text-sm">◎ {nft.price.toFixed(2)}</div>
+                      </div>
+                    </motion.a>
+                  ))
+                ) : (
+                  <div className="col-span-3 flex items-center justify-center h-48">
+                    <div className="text-white/50 font-mono">No deals available</div>
                   </div>
+                )}
+              </div>
+              <div className="mt-4 text-center">
+                <Link to="/gallery">
+                  <motion.span
+                    whileHover={{ x: 5 }}
+                    className="text-primo-yellow text-sm font-mono inline-flex items-center gap-2 hover:underline"
+                  >
+                    View all rare listings <ArrowRight size={14} />
+                  </motion.span>
+                </Link>
+              </div>
+            </motion.div>
 
-                  {/* Glitch line on hover */}
-                  <motion.div
-                    className="absolute top-0 left-0 right-0 h-1 bg-primo-pink opacity-0 group-hover:opacity-100"
-                    animate={{ scaleX: [0, 1, 0] }}
-                    transition={{ duration: 0.5, repeat: Infinity }}
-                  />
-                </div>
-              </motion.div>
-            ))}
+            {/* Recent Sales */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              className="bg-black/50 border-2 border-white/20 p-3 md:p-6"
+            >
+              <h3 className="font-display text-base md:text-xl text-white mb-3 md:mb-4 flex items-center gap-2">
+                <Zap size={16} className="text-primo-cyan md:w-5 md:h-5" />
+                RECENT SALES
+              </h3>
+              <div className="h-48 md:h-64 overflow-y-auto custom-scrollbar">
+                {chartsLoading ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-white/50 font-mono text-sm">Loading...</div>
+                  </div>
+                ) : recentSales.length > 0 ? (
+                  <div className="space-y-1.5 md:space-y-2">
+                    {recentSales.map((sale) => (
+                      <motion.div
+                        key={sale.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="flex items-center justify-between p-2 md:p-3 bg-black/30 border border-white/10"
+                      >
+                        <div className="flex items-center gap-2 md:gap-3">
+                          <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-primo-cyan rounded-full animate-pulse" />
+                          <span className="font-mono text-xs md:text-sm text-white/70 truncate max-w-[100px] md:max-w-none">{sale.name}</span>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-display text-primo-cyan text-sm md:text-base">◎ {sale.price}</div>
+                          <div className="font-mono text-[10px] md:text-xs text-white/40">{sale.time}</div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-white/50 font-mono text-sm">No recent sales</div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
           </div>
+
+          {/* Collection Stats */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="bg-black/50 border-2 border-primo-pink/50 p-3 md:p-6 mt-4 md:mt-6"
+          >
+            <h3 className="font-display text-base md:text-xl text-white mb-4 md:mb-6 text-center flex items-center justify-center gap-2">
+              <Users size={16} className="text-primo-pink md:w-5 md:h-5" />
+              COLLECTION STATS
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+              {[
+                { label: 'Total Supply', value: '2,746' },
+                { label: 'Listed', value: stats.find(s => s.key === 'listed')?.value?.replace('◎ ', '') || '--' },
+                { label: 'List Rate', value: `${((parseInt(stats.find(s => s.key === 'listed')?.value?.replace(/,/g, '') || 0) / 2746) * 100).toFixed(1)}%` },
+                { label: 'Diamond Hands', value: '💎 72%' },
+              ].map((stat, index) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="text-center p-2 md:p-4 border border-white/20 bg-black/30"
+                >
+                  <div className="font-display text-lg md:text-3xl text-white mb-0.5 md:mb-1">{stat.value}</div>
+                  <div className="font-mono text-[10px] md:text-xs text-white/50">{stat.label}</div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
 
       {/* FEATURED CAROUSEL */}
-      <section className="py-20 bg-black/60 backdrop-blur-sm overflow-hidden">
-        <div className="max-w-6xl mx-auto px-4 mb-10">
+      <section className="py-12 md:py-20 bg-black/60 backdrop-blur-sm overflow-hidden">
+        <div className="max-w-6xl mx-auto px-4 mb-6 md:mb-10">
           <motion.h2
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            className="font-display text-4xl md:text-6xl text-white"
+            className="font-display text-3xl md:text-6xl text-white"
           >
             FEATURED
           </motion.h2>
+          <p className="text-white/50 font-mono mt-1 md:mt-2 text-sm md:text-base">Click to buy on Magic Eden</p>
         </div>
 
         {/* Infinite Scroll */}
@@ -405,88 +630,114 @@ export default function Home() {
               animate={{ x: [0, -1400] }}
               transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
             >
-              {[...featuredNFTs, ...featuredNFTs, ...featuredNFTs].map((nft, index) => (
-                <motion.div
+              {[...displayFeatured, ...displayFeatured, ...displayFeatured].map((nft, index) => (
+                <motion.a
                   key={`${nft.id}-${index}`}
+                  href={nft.mintAddress ? `https://magiceden.io/item-details/${nft.mintAddress}` : 'https://magiceden.io/marketplace/primos'}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   whileHover={{ scale: 1.05, y: -10, zIndex: 10 }}
                   className="flex-shrink-0 w-56 md:w-72"
                 >
-                  <div className="primo-card">
-                    <div className="aspect-square overflow-hidden">
-                      <img
-                        src={nft.image}
-                        alt={nft.name}
-                        className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                      />
+                  <div
+                    className="bg-black relative overflow-hidden"
+                    style={{
+                      border: `3px solid ${
+                        nft.rarity && nft.rarity <= 100 ? '#FFD700' :
+                        nft.rarity && nft.rarity <= 500 ? '#9D4EDD' :
+                        nft.rarity && nft.rarity <= 1000 ? '#00CED1' :
+                        nft.rarity && nft.rarity <= 2000 ? '#32CD32' :
+                        '#FFFFFF'
+                      }`,
+                      boxShadow:
+                        nft.rarity && nft.rarity <= 100 ? '0 0 20px rgba(255,215,0,0.4)' :
+                        nft.rarity && nft.rarity <= 500 ? '0 0 20px rgba(157,78,221,0.4)' :
+                        nft.rarity && nft.rarity <= 1000 ? '0 0 15px rgba(0,206,209,0.3)' :
+                        nft.rarity && nft.rarity <= 2000 ? '0 0 10px rgba(50,205,50,0.2)' :
+                        'none'
+                    }}
+                  >
+                      <div className="aspect-square overflow-hidden">
+                        <img
+                          src={nft.image}
+                          alt={nft.name}
+                          className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
+                      {/* Rarity Badge */}
+                      {nft.rarity && (
+                        <div className={`absolute top-2 right-2 px-2 py-1 text-xs font-display ${
+                          nft.rarity <= 100 ? 'bg-[#FFD700] text-black' :
+                          nft.rarity <= 500 ? 'bg-[#9D4EDD] text-white' :
+                          nft.rarity <= 1000 ? 'bg-[#00CED1] text-black' :
+                          nft.rarity <= 2000 ? 'bg-[#32CD32] text-black' :
+                          'bg-white/80 text-black'
+                        }`}>
+                          #{nft.rarity}
+                        </div>
+                      )}
+                      <div className="p-4">
+                        <h3 className="font-display text-white truncate">{nft.name}</h3>
+                        <p className="font-mono text-primo-cyan text-sm">◎ {nft.price.toFixed(3)}</p>
+                      </div>
                     </div>
-                    <div className="p-4">
-                      <h3 className="font-display text-white">{nft.name}</h3>
-                      <p className="font-mono text-primo-cyan text-sm">◎ {nft.price}</p>
-                    </div>
-                  </div>
-                </motion.div>
+                </motion.a>
               ))}
             </motion.div>
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto px-4 mt-10 text-center">
+        <div className="max-w-6xl mx-auto px-4 mt-6 md:mt-10 text-center">
           <Link to="/gallery">
             <motion.button
-              whileHover={{ scale: 1.05, x: 5 }}
               whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-display tracking-wider"
+              className="inline-flex items-center gap-2 md:gap-3 px-6 md:px-8 py-3 md:py-4 bg-white text-black font-display tracking-wider text-sm md:text-base"
             >
-              VIEW ALL
-              <ArrowRight size={20} />
+              VIEW ALL LISTINGS
+              <ArrowRight size={18} />
             </motion.button>
           </Link>
         </div>
       </section>
 
       {/* EXPLORE GRID */}
-      <section className="py-20 bg-white/90 backdrop-blur-sm">
+      <section className="py-12 md:py-20 bg-white/90 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto px-4">
           <motion.h2
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            className="font-display text-4xl md:text-6xl text-black text-center mb-12"
+            className="font-display text-3xl md:text-6xl text-black text-center mb-8 md:mb-12"
           >
             EXPLORE
           </motion.h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-1">
             {quickLinks.map((link, index) => (
               <Link key={link.path} to={link.path}>
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  whileHover={{ scale: 0.98 }}
-                  className="relative bg-black text-white p-8 aspect-square flex flex-col justify-between group overflow-hidden"
+                  className="relative bg-black text-white p-4 md:p-8 aspect-square flex flex-col justify-between group overflow-hidden"
                 >
                   <motion.div
-                    className="absolute inset-0 bg-gradient-to-br from-primo-pink to-primo-cyan"
-                    initial={{ opacity: 0 }}
-                    whileHover={{ opacity: 1 }}
+                    className="absolute inset-0 bg-gradient-to-br from-primo-pink to-primo-cyan opacity-0 group-active:opacity-100 md:group-hover:opacity-100"
                     transition={{ duration: 0.3 }}
                   />
 
                   <div className="relative z-10">
-                    <link.icon size={36} className="group-hover:scale-110 transition-transform" />
+                    <link.icon size={24} className="md:w-9 md:h-9" />
                   </div>
 
                   <div className="relative z-10">
-                    <h3 className="font-display text-2xl mb-1">{link.label}</h3>
-                    <p className="font-mono text-sm text-white/60 group-hover:text-white/80">{link.desc}</p>
+                    <h3 className="font-display text-base md:text-2xl mb-0.5 md:mb-1">{link.label}</h3>
+                    <p className="font-mono text-[10px] md:text-sm text-white/60 hidden sm:block">{link.desc}</p>
                   </div>
 
                   <motion.div
-                    className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 z-10"
-                    initial={{ x: -10 }}
-                    whileHover={{ x: 0 }}
+                    className="absolute bottom-2 md:bottom-4 right-2 md:right-4 opacity-0 group-hover:opacity-100 z-10"
                   >
-                    <ArrowRight size={24} />
+                    <ArrowRight size={20} />
                   </motion.div>
                 </motion.div>
               </Link>
@@ -496,7 +747,7 @@ export default function Home() {
       </section>
 
       {/* COMMUNITY CTA */}
-      <section className="py-24 bg-black/70 backdrop-blur-sm relative overflow-hidden">
+      <section className="py-16 md:py-24 bg-black/70 backdrop-blur-sm relative overflow-hidden">
         {/* Background Pulse */}
         <div className="absolute inset-0">
           <motion.div
@@ -545,7 +796,7 @@ export default function Home() {
             className="flex flex-wrap justify-center gap-4"
           >
             <motion.a
-              href="https://discord.gg/primos"
+              href="https://discord.gg/XhCcZNfEVn"
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ scale: 1.05, y: -3 }}

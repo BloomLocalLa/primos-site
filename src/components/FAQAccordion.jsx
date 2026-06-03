@@ -22,18 +22,18 @@ export default function FAQAccordion({ items = [], category = '' }) {
           {/* Question */}
           <motion.button
             onClick={() => setOpenIndex(openIndex === index ? null : index)}
-            className="w-full px-6 py-4 flex items-center justify-between text-left group"
+            className="w-full px-4 md:px-6 py-3 md:py-4 flex items-center justify-between text-left group gap-3"
             whileHover={{ backgroundColor: 'rgba(255, 20, 147, 0.1)' }}
           >
-            <span className="font-display text-white group-hover:text-primo-pink transition-colors">
+            <span className="font-display text-sm md:text-base text-white group-hover:text-primo-pink transition-colors">
               {item.question}
             </span>
             <motion.div
               animate={{ rotate: openIndex === index ? 180 : 0 }}
               transition={{ duration: 0.2 }}
-              className="text-primo-cyan"
+              className="text-primo-cyan flex-shrink-0"
             >
-              {openIndex === index ? <Minus size={20} /> : <Plus size={20} />}
+              {openIndex === index ? <Minus size={18} /> : <Plus size={18} />}
             </motion.div>
           </motion.button>
 
@@ -47,11 +47,11 @@ export default function FAQAccordion({ items = [], category = '' }) {
                 transition={{ duration: 0.3 }}
                 className="overflow-hidden"
               >
-                <div className="px-6 pb-4 text-static-gray border-t border-static-dark pt-4">
+                <div className="px-4 md:px-6 pb-3 md:pb-4 text-static-gray border-t border-static-dark pt-3 md:pt-4">
                   <motion.p
                     initial={{ y: -10 }}
                     animate={{ y: 0 }}
-                    className="leading-relaxed"
+                    className="leading-relaxed text-sm md:text-base"
                   >
                     {item.answer}
                   </motion.p>

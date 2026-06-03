@@ -21,13 +21,21 @@ npm run dev
 | File | Purpose |
 |------|---------|
 | `src/App.jsx` | Main app with routes and cart context |
-| `src/pages/Home.jsx` | Landing page with hero, stats, featured NFTs |
-| `src/pages/Gallery.jsx` | NFT gallery with filters |
-| `src/pages/Merch.jsx` | Merchandise store |
-| `src/pages/Artwork.jsx` | Custom art commissions |
+| `src/pages/Home.jsx` | Landing page with hero, stats, featured NFTs, floating NFTs, best deals |
+| `src/pages/Gallery.jsx` | NFT gallery with filters, sorting, detail modal |
+| `src/pages/About.jsx` | Collection story + Explore Traits builder |
+| `src/pages/Community.jsx` | Top holders, live activity, community art section |
+| `src/pages/Team.jsx` | Team profiles |
+| `src/pages/Merch.jsx` | Merchandise store (coming soon) |
+| `src/pages/Artwork.jsx` | Custom art commissions (coming soon) |
+| `src/pages/FAQ.jsx` | FAQ with accordion |
 | `src/components/GlitchedBackground.jsx` | CRT/VHS glitch effects |
 | `src/components/TVStatic.jsx` | TV static overlay |
-| `src/components/Navbar.jsx` | Navigation |
+| `src/components/Navbar.jsx` | Navigation with mobile menu |
+| `src/components/NFTCard.jsx` | Reusable NFT card with rarity badges |
+| `src/components/FAQAccordion.jsx` | Expandable FAQ items |
+| `src/lib/magiceden.js` | Magic Eden API integration |
+| `api/magiceden.js` | Vercel serverless proxy for Magic Eden |
 | `src/index.css` | Tailwind theme with Primos colors |
 
 ## Routes
@@ -35,12 +43,30 @@ npm run dev
 |-------|------|
 | `/` | Home |
 | `/gallery` | NFT Gallery |
-| `/about` | Collection Story |
+| `/about` | Collection Story + Explore Traits |
 | `/team` | Team Profiles |
 | `/community` | Collector Spotlight |
 | `/merch` | Merchandise Store |
 | `/artwork` | Custom Art |
 | `/faq` | FAQ |
+
+## Magic Eden API Integration
+API calls proxied through Vercel serverless function (`api/magiceden.js`) for CORS.
+
+### Endpoints Used
+- `listings` - Get listed NFTs with prices
+- `stats` - Collection stats (floor, volume, holders)
+- `holder_stats` - Top holders data
+- `activities` - Recent sales/listings
+- `token` - Individual NFT metadata with attributes
+- `mmm_pools` - AMM pool listings
+
+### Key Functions (`src/lib/magiceden.js`)
+- `getListedNFTs(offset, limit)` - Fetch paginated listings
+- `getCollectionStats()` - Floor price, volume, etc.
+- `getTopHolders()` - Holder rankings
+- `getRecentActivity()` - Sales feed
+- `getTokenMetadata(mintAddress)` - NFT attributes
 
 ## Primos Artwork
 Local artwork files stored in `/public/artwork/` as AVIF images with IPFS hashes as filenames.
@@ -71,14 +97,27 @@ Local artwork files stored in `/public/artwork/` as AVIF images with IPFS hashes
 - `--color-primo-cyan: #00CED1`
 - `--color-primo-yellow: #FFD700`
 - `--color-primo-purple: #9B59B6`
+- `--color-primo-green: #32CD32`
 
 ## Development Notes
-- Deployment: Vercel recommended (config in `vercel.json`)
+- Deployment: Vercel (config in `vercel.json`)
 - Testing changes on live site, not dev server
-- Placeholder images (`picsum.photos`) need replacing with actual Primos artwork
+- All pages are fully mobile-responsive (optimized for 375px+)
+- IPFS images converted to HTTP gateway URLs (`nftstorage.link`)
+
+## Mobile Responsiveness
+All pages optimized with Tailwind responsive classes:
+- Smaller padding/margins on mobile (`p-4 md:p-8`)
+- Reduced text sizes (`text-sm md:text-base`)
+- Thinner borders (`border-2 md:border-4`)
+- Adjusted grid columns (`grid-cols-2 md:grid-cols-4`)
+- Hidden non-essential elements on mobile
 
 ## Current Status
-- Basic site structure complete
+- Site structure complete with all pages
+- Magic Eden API integration working (listings, stats, holders, activities, token metadata)
+- Explore Traits feature on About page (18 trait categories)
+- "Buy Your Dream Primo" / "Share Your Dream Primo" buttons
+- "From the Community" section on Community page
+- All pages mobile-optimized
 - CRT/VHS visual effects working
-- 17 Primos artwork images downloaded to `/public/artwork/`
-- Need to integrate local artwork into Home.jsx and GlitchedBackground.jsx

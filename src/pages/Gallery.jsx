@@ -143,18 +143,18 @@ export default function Gallery() {
   }
 
   return (
-    <div className="min-h-screen pt-28 pb-20 px-4">
+    <div className="min-h-screen pt-20 md:pt-28 pb-16 md:pb-20 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
+          className="mb-8 md:mb-12"
         >
-          <h1 className="font-display text-5xl md:text-7xl text-white mb-4">
+          <h1 className="font-display text-4xl md:text-7xl text-white mb-2 md:mb-4">
             <GlitchText text="GALLERY" />
           </h1>
-          <p className="text-static-gray font-mono">
+          <p className="text-static-gray font-mono text-sm md:text-base">
             Browse all 2,746 Primos. Click to view details or buy on Magic Eden.
           </p>
         </motion.div>
@@ -164,17 +164,17 @@ export default function Gallery() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="flex flex-wrap gap-4 mb-8"
+          className="flex flex-wrap gap-2 md:gap-4 mb-6 md:mb-8"
         >
           {/* Search */}
-          <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-static-gray" size={20} />
+          <div className="relative flex-1 min-w-[150px] md:min-w-[200px]">
+            <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-static-gray" size={18} />
             <input
               type="text"
-              placeholder="Search by name or ID..."
+              placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-black border-2 border-white text-white font-mono placeholder:text-static-gray focus:border-primo-pink outline-none transition-colors"
+              className="w-full pl-10 md:pl-12 pr-3 md:pr-4 py-2 md:py-3 bg-black border-2 border-white text-white font-mono text-sm md:text-base placeholder:text-static-gray focus:border-primo-pink outline-none transition-colors"
             />
           </div>
 
@@ -183,29 +183,29 @@ export default function Gallery() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowFilters(!showFilters)}
-            className={`px-6 py-3 border-2 font-display tracking-wider flex items-center gap-2 transition-colors ${
+            className={`px-3 md:px-6 py-2 md:py-3 border-2 font-display tracking-wider flex items-center gap-1 md:gap-2 text-sm md:text-base transition-colors ${
               showFilters
                 ? 'border-primo-pink bg-primo-pink text-black'
                 : 'border-white text-white hover:border-primo-pink'
             }`}
           >
-            <Filter size={20} />
-            FILTERS
+            <Filter size={18} />
+            <span className="hidden sm:inline">FILTERS</span>
           </motion.button>
 
           {/* Sort */}
           <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
-            className="px-6 py-3 bg-black border-2 border-white text-white font-mono cursor-pointer hover:border-primo-cyan transition-colors"
+            className="px-2 md:px-6 py-2 md:py-3 bg-black border-2 border-white text-white font-mono text-xs md:text-base cursor-pointer hover:border-primo-cyan transition-colors"
           >
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
+            <option value="price-asc">Price: Low</option>
+            <option value="price-desc">Price: High</option>
             <option value="rarity">Rarity</option>
           </select>
 
-          {/* Grid Size Toggle */}
-          <div className="flex border-2 border-white">
+          {/* Grid Size Toggle - Hidden on mobile */}
+          <div className="hidden md:flex border-2 border-white">
             <button
               onClick={() => setGridSize('normal')}
               className={`p-3 transition-colors ${
@@ -230,9 +230,9 @@ export default function Gallery() {
             whileTap={{ scale: 0.95 }}
             onClick={refreshData}
             disabled={loading}
-            className="p-3 border-2 border-white text-white hover:border-primo-green hover:text-primo-green transition-colors disabled:opacity-50"
+            className="p-2 md:p-3 border-2 border-white text-white hover:border-primo-green hover:text-primo-green transition-colors disabled:opacity-50"
           >
-            <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
           </motion.button>
         </motion.div>
 
@@ -243,9 +243,9 @@ export default function Gallery() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="mb-8 overflow-hidden"
+              className="mb-6 md:mb-8 overflow-hidden"
             >
-              <div className="p-6 bg-static-dark border-2 border-primo-pink">
+              <div className="p-4 md:p-6 bg-static-dark border-2 border-primo-pink">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {Object.entries(filterOptions).map(([key, options]) => (
                     <div key={key}>
@@ -281,7 +281,7 @@ export default function Gallery() {
         </AnimatePresence>
 
         {/* Results Count */}
-        <div className="mb-6 text-static-gray font-mono">
+        <div className="mb-4 md:mb-6 text-static-gray font-mono text-sm md:text-base">
           Showing {filteredNFTs.length} of {nfts.length} Primos
         </div>
 
@@ -302,10 +302,10 @@ export default function Gallery() {
         {/* NFT Grid */}
         {!loading && (
           <div
-            className={`grid gap-6 ${
+            className={`grid gap-3 md:gap-6 ${
               gridSize === 'large'
-                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
+                ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
             }`}
           >
             {filteredNFTs.map((nft, index) => (
@@ -355,7 +355,7 @@ export default function Gallery() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className="fixed left-1/2 top-[55%] -translate-x-1/2 -translate-y-1/2 z-[101] bg-black w-[95vw] md:w-[85vw] lg:w-[75vw] max-w-5xl h-auto max-h-[75vh]"
+                className="fixed left-1/2 top-[50%] md:top-[55%] -translate-x-1/2 -translate-y-1/2 z-[101] bg-black w-[95vw] md:w-[85vw] lg:w-[75vw] max-w-5xl h-auto max-h-[85vh] md:max-h-[75vh]"
                 style={{
                   border: `4px solid ${(() => {
                     const rank = selectedNFT.rarity
@@ -382,9 +382,9 @@ export default function Gallery() {
                   <X size={28} />
                 </button>
 
-                <div className="grid md:grid-cols-2 h-full max-h-[75vh] overflow-hidden">
+                <div className="grid md:grid-cols-2 h-full max-h-[85vh] md:max-h-[75vh] overflow-hidden">
                   {/* Image */}
-                  <div className="relative h-[200px] md:h-full overflow-hidden">
+                  <div className="relative h-[180px] sm:h-[220px] md:h-full overflow-hidden">
                     <img
                       src={selectedNFT.image}
                       alt={selectedNFT.name}
@@ -393,13 +393,13 @@ export default function Gallery() {
                   </div>
 
                   {/* Info */}
-                  <div className="p-4 md:p-6 flex flex-col h-full max-h-[75vh] overflow-hidden">
+                  <div className="p-3 md:p-6 flex flex-col h-full max-h-[85vh] md:max-h-[75vh] overflow-hidden">
                     {/* Header - Fixed */}
                     <div className="flex-shrink-0">
-                      <h2 className="font-display text-2xl md:text-3xl text-white mb-2">{selectedNFT.name}</h2>
-                      <div className="flex items-center gap-3 mb-4">
+                      <h2 className="font-display text-xl md:text-3xl text-white mb-1 md:mb-2">{selectedNFT.name}</h2>
+                      <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
                         {selectedNFT.rarity && (
-                          <span className={`px-2 py-1 font-display text-xs uppercase ${
+                          <span className={`px-1.5 md:px-2 py-0.5 md:py-1 font-display text-[10px] md:text-xs uppercase ${
                             selectedNFT.rarity <= 100 ? 'bg-primo-yellow text-black' :
                             selectedNFT.rarity <= 500 ? 'bg-primo-purple text-white' :
                             selectedNFT.rarity <= 1000 ? 'bg-primo-cyan text-black' :
@@ -413,24 +413,24 @@ export default function Gallery() {
                              'COMMON'} #{selectedNFT.rarity}
                           </span>
                         )}
-                        <span className="text-primo-cyan font-mono text-xl md:text-2xl">◎ {selectedNFT.price}</span>
+                        <span className="text-primo-cyan font-mono text-lg md:text-2xl">◎ {selectedNFT.price}</span>
                       </div>
                     </div>
 
                     {/* Attributes - Scrollable */}
                     {selectedNFT.attributes && selectedNFT.attributes.length > 0 && (
-                      <div className="flex-1 overflow-y-auto mb-4 min-h-0">
-                        <h3 className="font-display text-white text-sm mb-2 sticky top-0 bg-black py-1">ATTRIBUTES</h3>
-                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+                      <div className="flex-1 overflow-y-auto mb-3 md:mb-4 min-h-0">
+                        <h3 className="font-display text-white text-xs md:text-sm mb-2 sticky top-0 bg-black py-1">ATTRIBUTES</h3>
+                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5 md:gap-2">
                           {selectedNFT.attributes.map((attr, i) => (
                             <div
                               key={i}
-                              className="p-2 bg-static-dark border border-static-gray"
+                              className="p-1.5 md:p-2 bg-static-dark border border-static-gray"
                             >
-                              <div className="text-static-gray text-[10px] font-mono">
+                              <div className="text-static-gray text-[9px] md:text-[10px] font-mono">
                                 {attr.trait_type}
                               </div>
-                              <div className="text-white font-display text-sm truncate">{attr.value}</div>
+                              <div className="text-white font-display text-xs md:text-sm truncate">{attr.value}</div>
                             </div>
                           ))}
                         </div>
@@ -445,9 +445,9 @@ export default function Gallery() {
                         rel="noopener noreferrer"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        className="w-full py-3 bg-gradient-to-r from-primo-pink to-primo-purple text-white font-display tracking-wider flex items-center justify-center gap-2 border-2 border-white text-sm md:text-base"
+                        className="w-full py-2 md:py-3 bg-gradient-to-r from-primo-pink to-primo-purple text-white font-display tracking-wider flex items-center justify-center gap-2 border-2 border-white text-xs md:text-base"
                       >
-                        <ExternalLink size={18} />
+                        <ExternalLink size={16} />
                         BUY ON MAGIC EDEN
                       </motion.a>
                     </div>

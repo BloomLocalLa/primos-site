@@ -29,11 +29,22 @@ export default async function handler(req, res) {
         url = `${ME_API_BASE}/collections/${COLLECTION_SYMBOL}/listings?offset=${offset}&limit=${limit}`
         break
       case 'activities':
+        const actOffset = req.query.offset || 0
         const actLimit = req.query.limit || 10
-        url = `${ME_API_BASE}/collections/${COLLECTION_SYMBOL}/activities?offset=0&limit=${actLimit}`
+        url = `${ME_API_BASE}/collections/${COLLECTION_SYMBOL}/activities?offset=${actOffset}&limit=${actLimit}`
         break
       case 'amm-pools':
         url = `${ME_API_BASE}/mmm/pools?collectionSymbol=${COLLECTION_SYMBOL}`
+        break
+      case 'holder_stats':
+        url = `${ME_API_BASE}/collections/${COLLECTION_SYMBOL}/holder_stats`
+        break
+      case 'token':
+        const mint = req.query.mint
+        if (!mint) {
+          return res.status(400).json({ error: 'Missing mint address' })
+        }
+        url = `${ME_API_BASE}/tokens/${mint}`
         break
       default:
         return res.status(400).json({ error: 'Invalid endpoint' })

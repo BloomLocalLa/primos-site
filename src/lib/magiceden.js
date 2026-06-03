@@ -69,22 +69,37 @@ export async function getListedNFTs(offset = 0, limit = 50) {
   }
 }
 
-// Fetch recent activities (sales, listings)
+// Fetch recent activities (sales, listings) with pagination
 export async function getRecentActivities(limit = 10) {
   const cacheKey = `activities-${limit}`
   const cached = getCached(cacheKey)
   if (cached) return cached
 
   try {
-    const response = await fetch(
-      `${API_PROXY}?endpoint=activities&limit=${limit}`
-    )
+    // Fetch multiple pages to get more history
+    const batchSize = 500
+    const numBatches = Math.ceil(limit / batchSize)
+    let allActivities = []
 
-    if (!response.ok) throw new Error('Failed to fetch activities')
+    for (let i = 0; i < numBatches; i++) {
+      const offset = i * batchSize
+      const response = await fetch(
+        `${API_PROXY}?endpoint=activities&limit=${batchSize}&offset=${offset}`
+      )
 
-    const data = await response.json()
-    setCache(cacheKey, data)
-    return data
+      if (!response.ok) throw new Error('Failed to fetch activities')
+
+      const data = await response.json()
+      if (!data || data.length === 0) break
+
+      allActivities = [...allActivities, ...data]
+
+      // If we got less than requested, we've reached the end
+      if (data.length < batchSize) break
+    }
+
+    setCache(cacheKey, allActivities)
+    return allActivities
   } catch (error) {
     console.error('Error fetching activities:', error)
     return []
@@ -104,6 +119,56 @@ export function getMagicEdenUrl(mintAddress) {
 // Get collection URL
 export function getCollectionUrl() {
   return `https://magiceden.io/marketplace/primos`
+}
+
+// Fetch holder stats (top holders)
+export async function getHolderStats() {
+  const cacheKey = 'holder-stats'
+  const cached = getCached(cacheKey)
+  if (cached) return cached
+
+  try {
+    const response = await fetch(`${API_PROXY}?endpoint=holder_stats`)
+
+    if (!response.ok) throw new Error('Failed to fetch holder stats')
+
+    const data = await response.json()
+    setCache(cacheKey, data)
+    return data
+  } catch (error) {
+    console.error('Error fetching holder stats:', error)
+    return null
+  }
+}
+
+// Fetch single token metadata with attributes
+export async function getTokenMetadata(mintAddress) {
+  const cacheKey = `token-${mintAddress}`
+  const cached = getCached(cacheKey)
+  if (cached) return cached
+
+  try {
+    const response = await fetch(
+      `${API_PROXY}?endpoint=token&mint=${mintAddress}`
+    )
+
+    if (!response.ok) throw new Error('Failed to fetch token metadata')
+
+    const data = await response.json()
+    setCache(cacheKey, data)
+    return data
+  } catch (error) {
+    console.error('Error fetching token metadata:', error)
+    return null
+  }
+}
+
+// Fetch multiple token metadata in batch
+export async function getTokensMetadata(mintAddresses) {
+  const results = await Promise.all(
+    mintAddresses.map(mint => getTokenMetadata(mint))
+  )
+  return results.filter(Boolean)
 }
 
 // Fetch AMM pool listings

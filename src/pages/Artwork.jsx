@@ -20,25 +20,25 @@ export default function Artwork() {
   }
 
   return (
-    <div className="min-h-screen pt-28 pb-20 px-4">
+    <div className="min-h-screen pt-20 md:pt-28 pb-16 md:pb-20 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
+          className="text-center mb-10 md:mb-16"
         >
           <motion.div
             animate={{ rotate: [0, 10, -10, 0] }}
             transition={{ repeat: Infinity, duration: 3 }}
-            className="inline-block mb-6"
+            className="inline-block mb-4 md:mb-6"
           >
-            <Palette size={64} className="text-primo-pink" />
+            <Palette size={48} className="text-primo-pink md:w-16 md:h-16" />
           </motion.div>
-          <h1 className="font-display text-6xl md:text-8xl text-white mb-4">
+          <h1 className="font-display text-4xl md:text-8xl text-white mb-2 md:mb-4">
             <GlitchText text="CUSTOM ART" />
           </h1>
-          <p className="text-static-gray font-mono max-w-xl mx-auto">
+          <p className="text-static-gray font-mono max-w-xl mx-auto text-sm md:text-base">
             Commission unique artwork in the Primos retro style.
           </p>
         </motion.div>
@@ -48,28 +48,28 @@ export default function Artwork() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
-          className="relative mb-16"
+          className="relative mb-10 md:mb-16"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-primo-pink/20 via-primo-purple/20 to-primo-cyan/20 blur-xl" />
-          <div className="relative bg-black border-4 border-white p-12 text-center">
+          <div className="relative bg-black border-2 md:border-4 border-white p-6 md:p-12 text-center">
             <motion.div
               animate={{
                 scale: [1, 1.05, 1],
                 opacity: [0.5, 1, 0.5]
               }}
               transition={{ repeat: Infinity, duration: 2 }}
-              className="absolute top-4 right-4"
+              className="absolute top-2 right-2 md:top-4 md:right-4"
             >
-              <Sparkles className="text-primo-yellow" size={24} />
+              <Sparkles className="text-primo-yellow" size={20} />
             </motion.div>
 
-            <h2 className="font-display text-5xl md:text-7xl text-white mb-4">
+            <h2 className="font-display text-3xl md:text-7xl text-white mb-2 md:mb-4">
               COMING SOON
             </h2>
-            <p className="text-white/60 font-mono text-lg mb-2">
+            <p className="text-white/60 font-mono text-sm md:text-lg mb-1 md:mb-2">
               Custom art commissions are on the way.
             </p>
-            <p className="text-primo-cyan font-mono">
+            <p className="text-primo-cyan font-mono text-sm md:text-base">
               PFPs • Banners • Full Illustrations
             </p>
 
@@ -89,12 +89,12 @@ export default function Artwork() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-3 mb-4">
-              <MessageSquare className="text-primo-cyan" size={28} />
-              <h2 className="font-display text-3xl text-white">TELL US WHAT YOU WANT TO SEE</h2>
+          <div className="text-center mb-6 md:mb-8">
+            <div className="inline-flex items-center gap-2 md:gap-3 mb-2 md:mb-4">
+              <MessageSquare className="text-primo-cyan" size={22} />
+              <h2 className="font-display text-xl md:text-3xl text-white">TELL US WHAT YOU WANT TO SEE</h2>
             </div>
-            <p className="text-static-gray font-mono">
+            <p className="text-static-gray font-mono text-sm md:text-base">
               Your ideas help shape what we create. Let us know what kind of custom art you'd love.
             </p>
           </div>
@@ -103,21 +103,21 @@ export default function Artwork() {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-primo-green/20 border-2 border-primo-green p-8 text-center"
+              className="bg-primo-green/20 border-2 border-primo-green p-6 md:p-8 text-center"
             >
-              <div className="text-primo-green text-5xl mb-4">✓</div>
-              <h3 className="font-display text-2xl text-white mb-2">THANKS FOR YOUR INPUT!</h3>
-              <p className="text-static-gray font-mono">We'll take your ideas into consideration.</p>
+              <div className="text-primo-green text-4xl md:text-5xl mb-3 md:mb-4">✓</div>
+              <h3 className="font-display text-xl md:text-2xl text-white mb-2">THANKS FOR YOUR INPUT!</h3>
+              <p className="text-static-gray font-mono text-sm md:text-base">We'll take your ideas into consideration.</p>
               <button
                 onClick={() => setSubmitted(false)}
-                className="mt-6 px-6 py-2 border-2 border-white text-white font-display hover:bg-white hover:text-black transition-colors"
+                className="mt-4 md:mt-6 px-4 md:px-6 py-2 border-2 border-white text-white font-display text-sm md:text-base hover:bg-white hover:text-black transition-colors"
               >
                 SUBMIT ANOTHER IDEA
               </button>
             </motion.div>
           ) : (
-            <form onSubmit={handleSubmit} className="bg-static-dark border-4 border-white p-8">
-              <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <form onSubmit={handleSubmit} className="bg-static-dark border-2 md:border-4 border-white p-4 md:p-8">
+              <div className="grid md:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
                 <div>
                   <label className="block font-display text-white mb-2">NAME</label>
                   <input
@@ -142,15 +142,15 @@ export default function Artwork() {
                 </div>
               </div>
 
-              <div className="mb-8">
-                <label className="block font-display text-white mb-2">WHAT KIND OF ART WOULD YOU LIKE?</label>
+              <div className="mb-6 md:mb-8">
+                <label className="block font-display text-white mb-2 text-sm md:text-base">WHAT KIND OF ART WOULD YOU LIKE?</label>
                 <textarea
                   required
-                  rows={5}
+                  rows={4}
                   value={formData.idea}
                   onChange={(e) => setFormData({ ...formData, idea: e.target.value })}
-                  className="w-full px-4 py-3 bg-black border-2 border-white text-white font-mono focus:border-primo-pink outline-none transition-colors resize-none"
-                  placeholder="Custom PFPs? Animated art? Physical prints? Tell us your ideas..."
+                  className="w-full px-3 md:px-4 py-2 md:py-3 bg-black border-2 border-white text-white font-mono text-sm md:text-base focus:border-primo-pink outline-none transition-colors resize-none"
+                  placeholder="Custom PFPs? Animated art? Tell us..."
                 />
               </div>
 
@@ -158,9 +158,9 @@ export default function Artwork() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
-                className="w-full py-4 bg-gradient-to-r from-primo-pink to-primo-purple text-white font-display text-lg tracking-wider border-2 border-white hover:shadow-[0_0_30px_rgba(255,20,147,0.5)] transition-shadow flex items-center justify-center gap-3"
+                className="w-full py-3 md:py-4 bg-gradient-to-r from-primo-pink to-primo-purple text-white font-display text-sm md:text-lg tracking-wider border-2 border-white hover:shadow-[0_0_30px_rgba(255,20,147,0.5)] transition-shadow flex items-center justify-center gap-2 md:gap-3"
               >
-                <Send size={20} />
+                <Send size={18} />
                 SUBMIT YOUR IDEA
               </motion.button>
             </form>

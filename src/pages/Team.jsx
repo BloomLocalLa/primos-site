@@ -4,75 +4,46 @@ import GlitchText from '../components/GlitchText'
 
 const team = [
   {
-    name: 'FOUNDER NAME',
+    name: 'LORDIO',
     role: 'Founder & Artist',
-    image: 'https://picsum.photos/seed/team1/400/400',
-    bio: 'The creative mind behind Primos. Passionate about 90s nostalgia and digital art.',
+    image: 'https://pbs.twimg.com/profile_images/2012171988849319936/m_E3LWcz_400x400.jpg',
+    bio: 'The creative mind behind Primos. Building a community within communities on Solana.',
     socials: {
-      twitter: 'https://x.com/',
-      discord: '#',
-    },
-  },
-  {
-    name: 'DEV NAME',
-    role: 'Lead Developer',
-    image: 'https://picsum.photos/seed/team2/400/400',
-    bio: 'Building the technical infrastructure. Making sure everything runs smoothly on Solana.',
-    socials: {
-      twitter: 'https://x.com/',
-    },
-  },
-  {
-    name: 'COMMUNITY LEAD',
-    role: 'Community Manager',
-    image: 'https://picsum.photos/seed/team3/400/400',
-    bio: 'Keeping the Discord alive and the vibes immaculate. Your go-to for community questions.',
-    socials: {
-      twitter: 'https://x.com/',
-      discord: '#',
-    },
-  },
-  {
-    name: 'ARTIST NAME',
-    role: 'Artist',
-    image: 'https://picsum.photos/seed/team4/400/400',
-    bio: 'Creating stunning visuals and custom artwork. Master of retro aesthetics.',
-    socials: {
-      twitter: 'https://x.com/',
+      twitter: 'https://x.com/LordioWeb3',
+      discord: 'https://discord.gg/XhCcZNfEVn',
     },
   },
 ]
 
 export default function Team() {
   return (
-    <div className="min-h-screen pt-28 pb-20 px-4">
+    <div className="min-h-screen pt-20 md:pt-28 pb-16 md:pb-20 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
+          className="text-center mb-10 md:mb-16"
         >
-          <h1 className="font-display text-6xl md:text-8xl text-white mb-4">
+          <h1 className="font-display text-4xl md:text-8xl text-white mb-2 md:mb-4">
             <GlitchText text="THE TEAM" />
           </h1>
-          <p className="text-static-gray font-mono max-w-xl mx-auto">
-            Meet the humans behind the pixels. We're a small team with big dreams.
+          <p className="text-static-gray font-mono max-w-xl mx-auto text-sm md:text-base">
+            Meet the human behind the pixels.
           </p>
         </motion.div>
 
         {/* Team Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="flex justify-center px-4">
           {team.map((member, index) => (
             <motion.div
               key={member.name}
               initial={{ opacity: 0, y: 50, rotate: -5 }}
               animate={{ opacity: 1, y: 0, rotate: 0 }}
               transition={{ delay: index * 0.1 }}
-              whileHover={{ y: -10, rotate: 2 }}
-              className="group"
+              className="group w-full max-w-xs md:max-w-sm"
             >
-              <div className="bg-black border-4 border-white overflow-hidden relative">
+              <div className="bg-black border-2 md:border-4 border-white overflow-hidden relative">
                 {/* Glitch Effect Layers */}
                 <div className="absolute inset-0 bg-primo-red/0 group-hover:bg-primo-red/20 translate-x-0 group-hover:translate-x-1 transition-all z-10 pointer-events-none" />
                 <div className="absolute inset-0 bg-primo-cyan/0 group-hover:bg-primo-cyan/20 translate-x-0 group-hover:-translate-x-1 transition-all z-10 pointer-events-none" />
@@ -96,13 +67,13 @@ export default function Team() {
                 </div>
 
                 {/* Info */}
-                <div className="p-6 border-t-4 border-white">
-                  <h3 className="font-display text-xl text-white mb-1 flex items-center gap-2">
+                <div className="p-4 md:p-6 border-t-2 md:border-t-4 border-white">
+                  <h3 className="font-display text-lg md:text-xl text-white mb-1 flex items-center gap-2">
                     {member.name}
-                    <Sparkles size={16} className="text-primo-yellow" />
+                    <Sparkles size={14} className="text-primo-yellow md:w-4 md:h-4" />
                   </h3>
-                  <p className="text-primo-cyan font-mono text-sm mb-3">{member.role}</p>
-                  <p className="text-static-gray text-sm mb-4">{member.bio}</p>
+                  <p className="text-primo-cyan font-mono text-xs md:text-sm mb-2 md:mb-3">{member.role}</p>
+                  <p className="text-static-gray text-xs md:text-sm mb-3 md:mb-4">{member.bio}</p>
 
                   {/* Socials */}
                   <div className="flex gap-2">
@@ -157,23 +128,22 @@ export default function Team() {
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          className="mt-20 text-center"
+          className="mt-12 md:mt-20 text-center"
         >
-          <div className="inline-block bg-static-dark border-4 border-dashed border-primo-cyan p-8">
-            <h2 className="font-display text-2xl text-white mb-4">WANT TO JOIN US?</h2>
-            <p className="text-static-gray mb-6 max-w-md">
+          <div className="bg-static-dark border-2 md:border-4 border-dashed border-primo-cyan p-4 md:p-8 mx-auto max-w-md">
+            <h2 className="font-display text-xl md:text-2xl text-white mb-2 md:mb-4">WANT TO JOIN US?</h2>
+            <p className="text-static-gray mb-4 md:mb-6 text-sm md:text-base">
               We're always looking for talented individuals who share our passion for
               retro aesthetics and Web3 innovation.
             </p>
             <motion.a
-              href="https://discord.gg/primos"
+              href="https://discord.gg/XhCcZNfEVn"
               target="_blank"
               rel="noopener noreferrer"
-              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-primo-cyan text-black font-display tracking-wider hover:bg-white transition-colors"
+              className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 bg-primo-cyan text-black font-display tracking-wider text-sm md:text-base"
             >
-              <MessageCircle size={20} />
+              <MessageCircle size={18} />
               REACH OUT ON DISCORD
             </motion.a>
           </div>

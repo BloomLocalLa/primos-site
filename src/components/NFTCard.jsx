@@ -57,7 +57,7 @@ export default function NFTCard({ nft, index = 0 }) {
           rarity && rarity <= 500 ? 'epic-card' : ''
         }`}
         style={{
-          border: `4px solid ${getBorderColor()}`,
+          border: `2px solid ${getBorderColor()}`,
         }}
       >
         {/* Glitch Effect on Hover */}
@@ -96,7 +96,7 @@ export default function NFTCard({ nft, index = 0 }) {
           {/* Rarity Badge */}
           {rarity && (
             <div
-              className="absolute top-2 right-2 px-2 py-1 text-xs font-display uppercase tracking-wider"
+              className="absolute top-1 right-1 md:top-2 md:right-2 px-1.5 md:px-2 py-0.5 md:py-1 text-[10px] md:text-xs font-display uppercase tracking-wider"
               style={{
                 backgroundColor: getBorderColor(),
                 color: rarity <= 500 ? '#FFFFFF' : '#000000'
@@ -110,14 +110,14 @@ export default function NFTCard({ nft, index = 0 }) {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 20 }}
-            className="absolute bottom-2 left-2 right-2 flex gap-2"
+            className="absolute bottom-1 left-1 right-1 md:bottom-2 md:left-2 md:right-2 flex gap-1 md:gap-2"
           >
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="flex-1 py-2 bg-black/80 text-white text-xs font-display flex items-center justify-center gap-1 border border-white hover:bg-primo-pink hover:border-primo-pink transition-colors"
+              className="flex-1 py-1.5 md:py-2 bg-black/80 text-white text-[10px] md:text-xs font-display flex items-center justify-center gap-1 border border-white hover:bg-primo-pink hover:border-primo-pink transition-colors"
             >
-              <Eye size={14} />
+              <Eye size={12} className="md:w-3.5 md:h-3.5" />
               VIEW
             </motion.button>
             <motion.a
@@ -126,39 +126,39 @@ export default function NFTCard({ nft, index = 0 }) {
               rel="noopener noreferrer"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="flex-1 py-2 bg-primo-cyan text-black text-xs font-display flex items-center justify-center gap-1 border border-primo-cyan hover:bg-white transition-colors"
+              className="flex-1 py-1.5 md:py-2 bg-primo-cyan text-black text-[10px] md:text-xs font-display flex items-center justify-center gap-1 border border-primo-cyan hover:bg-white transition-colors"
             >
-              <ExternalLink size={14} />
+              <ExternalLink size={12} className="md:w-3.5 md:h-3.5" />
               BUY
             </motion.a>
           </motion.div>
         </div>
 
         {/* Info Section */}
-        <div className="p-3" style={{ borderTop: `4px solid ${getBorderColor()}` }}>
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="font-display text-white truncate">{name}</h3>
+        <div className="p-2 md:p-3" style={{ borderTop: `2px solid ${getBorderColor()}` }}>
+          <div className="flex items-center justify-between mb-1 md:mb-2">
+            <h3 className="font-display text-xs md:text-base text-white truncate">{name}</h3>
             {isHovered && (
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 className="text-primo-yellow"
               >
-                <Sparkles size={16} />
+                <Sparkles size={14} className="md:w-4 md:h-4" />
               </motion.div>
             )}
           </div>
 
           {price && (
-            <div className="flex items-center gap-2">
-              <span className="text-primo-cyan font-mono text-sm">◎ {price}</span>
-              <span className="text-static-gray text-xs">SOL</span>
+            <div className="flex items-center gap-1 md:gap-2">
+              <span className="text-primo-cyan font-mono text-xs md:text-sm">◎ {price}</span>
+              <span className="text-static-gray text-[10px] md:text-xs">SOL</span>
             </div>
           )}
 
-          {/* Attributes Preview */}
+          {/* Attributes Preview - Hidden on mobile for cleaner look */}
           {attributes.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-2">
+            <div className="hidden sm:flex flex-wrap gap-1 mt-2">
               {attributes.slice(0, 3).map((attr, i) => (
                 <span
                   key={i}
@@ -175,10 +175,10 @@ export default function NFTCard({ nft, index = 0 }) {
         </div>
 
         {/* Corner Decorations */}
-        <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-primo-pink" />
-        <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-primo-cyan" />
-        <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-primo-cyan" />
-        <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-primo-pink" />
+        <div className="absolute top-0 left-0 w-2 h-2 md:w-4 md:h-4 border-t-2 border-l-2 border-primo-pink" />
+        <div className="absolute top-0 right-0 w-2 h-2 md:w-4 md:h-4 border-t-2 border-r-2 border-primo-cyan" />
+        <div className="absolute bottom-0 left-0 w-2 h-2 md:w-4 md:h-4 border-b-2 border-l-2 border-primo-cyan" />
+        <div className="absolute bottom-0 right-0 w-2 h-2 md:w-4 md:h-4 border-b-2 border-r-2 border-primo-pink" />
       </div>
     </motion.div>
   )

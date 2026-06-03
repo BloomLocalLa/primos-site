@@ -21,9 +21,14 @@ export default defineConfig({
           } else if (endpoint === 'listings') {
             return `/collections/primos/listings?offset=${offset}&limit=${limit}`
           } else if (endpoint === 'activities') {
-            return `/collections/primos/activities?offset=0&limit=${limit}`
+            return `/collections/primos/activities?offset=${offset}&limit=${limit}`
           } else if (endpoint === 'amm-pools') {
             return '/mmm/pools?collectionSymbol=primos'
+          } else if (endpoint === 'holder_stats') {
+            return '/collections/primos/holder_stats'
+          } else if (endpoint === 'token') {
+            const mint = url.searchParams.get('mint')
+            return `/tokens/${mint}`
           }
           return path
         },

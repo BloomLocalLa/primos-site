@@ -4,7 +4,7 @@ import { Twitter, MessageCircle, ExternalLink, Zap } from 'lucide-react'
 
 const socialLinks = [
   { icon: Twitter, label: 'X / Twitter', href: 'https://x.com/PrimosNFT' },
-  { icon: MessageCircle, label: 'Discord', href: 'https://discord.gg/primos' },
+  { icon: MessageCircle, label: 'Discord', href: 'https://discord.gg/XhCcZNfEVn' },
   { icon: ExternalLink, label: 'Magic Eden', href: 'https://magiceden.io/marketplace/primos' },
 ]
 

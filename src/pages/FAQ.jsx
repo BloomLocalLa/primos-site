@@ -114,25 +114,25 @@ export default function FAQ() {
   })).filter((cat) => cat.items.length > 0)
 
   return (
-    <div className="min-h-screen pt-28 pb-20 px-4">
+    <div className="min-h-screen pt-20 md:pt-28 pb-16 md:pb-20 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="text-center mb-8 md:mb-12"
         >
           <motion.div
             animate={{ rotate: [0, 10, -10, 0] }}
             transition={{ repeat: Infinity, duration: 5 }}
-            className="inline-block mb-6"
+            className="inline-block mb-4 md:mb-6"
           >
-            <HelpCircle size={64} className="text-primo-cyan" />
+            <HelpCircle size={48} className="text-primo-cyan md:w-16 md:h-16" />
           </motion.div>
-          <h1 className="font-display text-6xl md:text-8xl text-white mb-4">
+          <h1 className="font-display text-4xl md:text-8xl text-white mb-2 md:mb-4">
             <GlitchText text="FAQ" />
           </h1>
-          <p className="text-static-gray font-mono max-w-xl mx-auto">
+          <p className="text-static-gray font-mono max-w-xl mx-auto text-sm md:text-base">
             Got questions? We've got answers. If you can't find what you're looking for, hit us up on Discord.
           </p>
         </motion.div>
@@ -142,16 +142,16 @@ export default function FAQ() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="mb-12"
+          className="mb-8 md:mb-12"
         >
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-static-gray" size={20} />
+            <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-static-gray" size={18} />
             <input
               type="text"
               placeholder="Search FAQ..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 bg-black border-4 border-white text-white font-mono placeholder:text-static-gray focus:border-primo-pink outline-none transition-colors"
+              className="w-full pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 bg-black border-2 md:border-4 border-white text-white font-mono text-sm md:text-base placeholder:text-static-gray focus:border-primo-pink outline-none transition-colors"
             />
           </div>
         </motion.div>
@@ -161,11 +161,11 @@ export default function FAQ() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="flex flex-wrap gap-2 mb-8"
+          className="flex flex-wrap gap-1.5 md:gap-2 mb-6 md:mb-8"
         >
           <button
             onClick={() => setActiveCategory(null)}
-            className={`px-4 py-2 font-display text-sm tracking-wider border-2 transition-all ${
+            className={`px-2 md:px-4 py-1.5 md:py-2 font-display text-xs md:text-sm tracking-wider border-2 transition-all ${
               activeCategory === null
                 ? 'border-primo-pink bg-primo-pink text-black'
                 : 'border-white text-white hover:border-primo-cyan'
@@ -177,7 +177,7 @@ export default function FAQ() {
             <button
               key={cat.name}
               onClick={() => setActiveCategory(cat.name)}
-              className={`px-4 py-2 font-display text-sm tracking-wider border-2 transition-all ${
+              className={`px-2 md:px-4 py-1.5 md:py-2 font-display text-xs md:text-sm tracking-wider border-2 transition-all ${
                 activeCategory === cat.name
                   ? 'border-primo-pink bg-primo-pink text-black'
                   : 'border-white text-white hover:border-primo-cyan'
@@ -189,7 +189,7 @@ export default function FAQ() {
         </motion.div>
 
         {/* FAQ Sections */}
-        <div className="space-y-12">
+        <div className="space-y-8 md:space-y-12">
           {(searchQuery ? filteredCategories : faqCategories)
             .filter((cat) => !activeCategory || cat.name === activeCategory)
             .map((category, index) => (
@@ -199,9 +199,9 @@ export default function FAQ() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                <div className="flex items-center gap-3 mb-6">
-                  <category.icon size={24} className={category.color} />
-                  <h2 className="font-display text-2xl text-white">{category.name}</h2>
+                <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+                  <category.icon size={20} className={`${category.color} md:w-6 md:h-6`} />
+                  <h2 className="font-display text-lg md:text-2xl text-white">{category.name}</h2>
                 </div>
                 <FAQAccordion items={category.items} />
               </motion.section>
@@ -213,13 +213,13 @@ export default function FAQ() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-12"
+            className="text-center py-8 md:py-12"
           >
-            <div className="text-6xl mb-4">🔍</div>
-            <p className="text-static-gray font-mono mb-4">No results found for "{searchQuery}"</p>
+            <div className="text-4xl md:text-6xl mb-3 md:mb-4">🔍</div>
+            <p className="text-static-gray font-mono text-sm md:text-base mb-3 md:mb-4">No results found for "{searchQuery}"</p>
             <button
               onClick={() => setSearchQuery('')}
-              className="text-primo-cyan hover:text-primo-pink transition-colors"
+              className="text-primo-cyan hover:text-primo-pink transition-colors text-sm md:text-base"
             >
               Clear search
             </button>
@@ -230,26 +230,26 @@ export default function FAQ() {
         <motion.section
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          className="mt-20"
+          className="mt-12 md:mt-20"
         >
-          <div className="bg-gradient-to-r from-primo-pink/20 via-primo-cyan/20 to-primo-yellow/20 border-4 border-white p-8 text-center">
-            <h2 className="font-display text-3xl text-white mb-4">
+          <div className="bg-gradient-to-r from-primo-pink/20 via-primo-cyan/20 to-primo-yellow/20 border-2 md:border-4 border-white p-4 md:p-8 text-center">
+            <h2 className="font-display text-xl md:text-3xl text-white mb-2 md:mb-4">
               STILL HAVE <span className="text-primo-pink">QUESTIONS</span>?
             </h2>
-            <p className="text-static-gray mb-8 max-w-md mx-auto">
+            <p className="text-static-gray mb-6 md:mb-8 max-w-md mx-auto text-sm md:text-base">
               Can't find what you're looking for? Our community is here to help.
               Join our Discord or reach out on X.
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
+            <div className="flex flex-wrap justify-center gap-3 md:gap-4">
               <motion.a
-                href="https://discord.gg/primos"
+                href="https://discord.gg/XhCcZNfEVn"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="retro-btn flex items-center gap-2"
+                className="retro-btn flex items-center gap-2 text-sm md:text-base px-4 md:px-6 py-2 md:py-3"
               >
-                <MessageCircle size={20} />
+                <MessageCircle size={18} />
                 ASK ON DISCORD
               </motion.a>
               <motion.a
@@ -258,9 +258,9 @@ export default function FAQ() {
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-6 py-3 bg-transparent border-3 border-primo-cyan text-primo-cyan font-display tracking-wider hover:bg-primo-cyan hover:text-black transition-colors flex items-center gap-2"
+                className="px-4 md:px-6 py-2 md:py-3 bg-transparent border-2 md:border-3 border-primo-cyan text-primo-cyan font-display tracking-wider text-sm md:text-base hover:bg-primo-cyan hover:text-black transition-colors flex items-center gap-2"
               >
-                <Twitter size={20} />
+                <Twitter size={18} />
                 DM ON X
               </motion.a>
             </div>

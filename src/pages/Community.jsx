@@ -1,58 +1,89 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Twitter, MessageCircle, ExternalLink, Heart, Star, Sparkles, Trophy, Users } from 'lucide-react'
+import { Twitter, MessageCircle, Heart, Users, Zap, TrendingUp, Package, ExternalLink, Wallet, Palette, Shirt, Frame } from 'lucide-react'
 import GlitchText from '../components/GlitchText'
-
-const spotlightMembers = [
-  {
-    username: 'PrimoWhale',
-    avatar: 'https://picsum.photos/seed/member1/200/200',
-    primosOwned: 42,
-    since: 'Day 1',
-    quote: 'Primos changed my perspective on NFTs. The community is unmatched.',
-    twitter: 'https://x.com/',
-    featured: true,
-  },
-  {
-    username: 'RetroCollector',
-    avatar: 'https://picsum.photos/seed/member2/200/200',
-    primosOwned: 28,
-    since: 'Week 1',
-    quote: 'The art reminds me of Saturday mornings as a kid. Pure nostalgia.',
-    twitter: 'https://x.com/',
-  },
-  {
-    username: 'SolanaDegen',
-    avatar: 'https://picsum.photos/seed/member3/200/200',
-    primosOwned: 15,
-    since: 'Month 1',
-    quote: 'Best community on Solana. Period.',
-    twitter: 'https://x.com/',
-  },
-  {
-    username: 'NFTEnthusiast',
-    avatar: 'https://picsum.photos/seed/member4/200/200',
-    primosOwned: 8,
-    since: 'Month 2',
-    quote: 'Holding these forever. The vibes are immaculate.',
-    twitter: 'https://x.com/',
-  },
-]
-
-const communityHighlights = [
-  { stat: '1,200+', label: 'HOLDERS', icon: Users },
-  { stat: '5,000+', label: 'DISCORD MEMBERS', icon: MessageCircle },
-  { stat: '10K+', label: 'X FOLLOWERS', icon: Twitter },
-  { stat: '∞', label: 'GOOD VIBES', icon: Heart },
-]
-
-const recentActivity = [
-  { type: 'sale', user: 'PrimoWhale', item: 'Primo #1234', price: '2.5 SOL', time: '2h ago' },
-  { type: 'list', user: 'RetroCollector', item: 'Primo #5678', price: '3.2 SOL', time: '4h ago' },
-  { type: 'sale', user: 'SolanaDegen', item: 'Primo #9012', price: '1.8 SOL', time: '6h ago' },
-  { type: 'mint', user: 'NewHolder', item: 'Primo #3456', price: '1.0 SOL', time: '12h ago' },
-]
+import { getCollectionStats, getRecentActivities, getHolderStats, lamportsToSol } from '../lib/magiceden'
 
 export default function Community() {
+  const [stats, setStats] = useState(null)
+  const [recentActivity, setRecentActivity] = useState([])
+  const [topHolders, setTopHolders] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [statsData, activities, holderData] = await Promise.all([
+          getCollectionStats(),
+          getRecentActivities(20),
+          getHolderStats(),
+        ])
+
+        setStats({
+          holders: holderData?.totalHolders || 738,
+          listedCount: statsData.listedCount || 0,
+          floorPrice: lamportsToSol(statsData.floorPrice || 0),
+          volumeAll: (statsData.volumeAll / 1e9).toFixed(0),
+        })
+
+        // Process top holders - log to debug
+        console.log('Holder data from API:', holderData)
+        if (holderData?.topHolders) {
+          console.log('Top holders:', holderData.topHolders)
+          setTopHolders(holderData.topHolders.slice(0, 10))
+        }
+
+        // Process recent activities (sales and listings) - limit to 5
+        const processed = activities
+          .filter(a => a.type === 'buyNow' || a.type === 'list')
+          .slice(0, 5)
+          .map((activity, i) => {
+            let imageUrl = activity.image || '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif'
+            if (imageUrl.startsWith('ipfs://')) {
+              imageUrl = imageUrl.replace('ipfs://', 'https://nftstorage.link/ipfs/')
+            }
+
+            return {
+              id: i,
+              type: activity.type === 'buyNow' ? 'sale' : 'list',
+              price: (activity.price / 1e9).toFixed(3),
+              time: getTimeAgo(activity.blockTime * 1000),
+              buyer: activity.buyer?.slice(0, 4) + '...' + activity.buyer?.slice(-4),
+              seller: activity.seller?.slice(0, 4) + '...' + activity.seller?.slice(-4),
+              image: imageUrl,
+              mintAddress: activity.tokenMint,
+            }
+          })
+
+        setRecentActivity(processed)
+      } catch (error) {
+        console.error('Failed to fetch community data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  function getTimeAgo(timestamp) {
+    const seconds = Math.floor((Date.now() - timestamp) / 1000)
+    if (seconds < 60) return `${seconds}s ago`
+    const minutes = Math.floor(seconds / 60)
+    if (minutes < 60) return `${minutes}m ago`
+    const hours = Math.floor(minutes / 60)
+    if (hours < 24) return `${hours}h ago`
+    const days = Math.floor(hours / 24)
+    return `${days}d ago`
+  }
+
+  const communityHighlights = [
+    { stat: stats?.holders?.toLocaleString() || '738', label: 'UNIQUE HOLDERS', icon: Users },
+    { stat: stats?.listedCount?.toLocaleString() || '--', label: 'LISTED', icon: Package },
+    { stat: `◎${stats?.floorPrice || '--'}`, label: 'FLOOR PRICE', icon: TrendingUp },
+    { stat: `◎${stats?.volumeAll || '--'}`, label: 'TOTAL VOLUME', icon: Zap },
+  ]
+
   return (
     <div className="min-h-screen pt-28 pb-20 px-4">
       <div className="max-w-7xl mx-auto">
@@ -66,185 +97,272 @@ export default function Community() {
             <GlitchText text="COMMUNITY" />
           </h1>
           <p className="text-static-gray font-mono max-w-xl mx-auto">
-            Meet the amazing people who make Primos special. Collectors, creators, and friends.
+            A community within communities. {stats?.holders || 738} unique holders and counting.
           </p>
         </motion.div>
 
-        {/* Stats */}
+        {/* Live Stats */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16"
+          className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-10 md:mb-16"
         >
           {communityHighlights.map((item, index) => (
             <motion.div
               key={item.label}
-              whileHover={{ scale: 1.05, rotate: index % 2 === 0 ? 2 : -2 }}
-              className="bg-black border-4 border-white p-6 text-center group"
+              className="bg-black border-2 md:border-4 border-white p-3 md:p-6 text-center group"
             >
               <item.icon
-                size={32}
-                className="mx-auto mb-3 text-primo-cyan group-hover:text-primo-pink transition-colors"
+                size={24}
+                className="mx-auto mb-2 md:mb-3 text-primo-cyan md:w-8 md:h-8"
               />
-              <div className="font-display text-3xl text-white mb-1">{item.stat}</div>
-              <div className="text-static-gray text-xs font-mono">{item.label}</div>
+              <div className="font-display text-xl md:text-3xl text-white mb-0.5 md:mb-1">{item.stat}</div>
+              <div className="text-static-gray text-[10px] md:text-xs font-mono">{item.label}</div>
             </motion.div>
           ))}
         </motion.div>
 
-        {/* Featured Member */}
-        <motion.section
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          className="mb-16"
-        >
-          <h2 className="font-display text-3xl text-white mb-8 flex items-center gap-3">
-            <Trophy className="text-primo-yellow" />
-            COLLECTOR SPOTLIGHT
-          </h2>
+        {/* Two Column Layout: Top Holders + Live Activity */}
+        <div className="grid lg:grid-cols-2 gap-4 md:gap-8 mb-10 md:mb-16">
+          {/* Top Holders */}
+          <section>
+            <h2 className="font-display text-lg md:text-2xl text-white mb-4 md:mb-6 flex items-center gap-2 md:gap-3">
+              <Wallet className="text-primo-yellow" size={20} />
+              TOP HOLDERS
+            </h2>
 
-          {spotlightMembers.filter(m => m.featured).map((member) => (
-            <motion.div
-              key={member.username}
-              whileHover={{ scale: 1.02 }}
-              className="bg-gradient-to-r from-primo-pink/20 to-primo-cyan/20 border-4 border-primo-yellow p-8 relative overflow-hidden"
-            >
-              {/* Background Decoration */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primo-yellow/10 rounded-full blur-3xl" />
-
-              <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-                {/* Avatar */}
-                <motion.div
-                  animate={{ rotate: [0, 5, -5, 0] }}
-                  transition={{ repeat: Infinity, duration: 5 }}
-                  className="relative"
-                >
-                  <div className="w-32 h-32 border-4 border-primo-yellow overflow-hidden">
-                    <img
-                      src={member.avatar}
-                      alt={member.username}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="absolute -top-2 -right-2 p-2 bg-primo-yellow text-black">
-                    <Star size={20} />
-                  </div>
-                </motion.div>
-
-                {/* Info */}
-                <div className="flex-1 text-center md:text-left">
-                  <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
-                    <h3 className="font-display text-2xl text-white">{member.username}</h3>
-                    <Sparkles className="text-primo-yellow" size={20} />
-                  </div>
-                  <div className="flex items-center justify-center md:justify-start gap-4 text-static-gray font-mono text-sm mb-4">
-                    <span>{member.primosOwned} Primos</span>
-                    <span>•</span>
-                    <span>Holder since {member.since}</span>
-                  </div>
-                  <blockquote className="text-lg text-primo-cyan italic mb-4">
-                    "{member.quote}"
-                  </blockquote>
-                  <a
-                    href={member.twitter}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-static-gray hover:text-primo-pink transition-colors"
-                  >
-                    <Twitter size={18} />
-                    Follow on X
-                  </a>
-                </div>
+            <div className="bg-black border-2 md:border-4 border-primo-yellow overflow-hidden">
+              {/* Header */}
+              <div className="p-2 md:p-3 border-b border-static-dark flex justify-between text-[10px] md:text-xs font-mono text-static-gray">
+                <span>WALLET</span>
+                <span>HOLDINGS</span>
               </div>
-            </motion.div>
-          ))}
-        </motion.section>
 
-        {/* Member Grid */}
-        <section className="mb-16">
-          <h2 className="font-display text-3xl text-white mb-8 flex items-center gap-3">
-            <Users className="text-primo-cyan" />
-            TOP HOLDERS
+              {loading ? (
+                <div className="p-4 md:p-6 text-center text-static-gray font-mono text-sm">Loading holders...</div>
+              ) : topHolders.length > 0 ? (
+                <div className="divide-y divide-static-dark max-h-[280px] md:max-h-[350px] overflow-y-auto custom-scrollbar">
+                  {topHolders.map((holder, index) => {
+                    const holdingCount = holder.tokens || holder.amount || holder.count || 0
+                    return (
+                      <motion.a
+                        key={holder.owner}
+                        href={`https://magiceden.io/u/${holder.owner}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.03 }}
+                        className="p-2 md:p-3 flex items-center justify-between hover:bg-static-dark/50 transition-colors cursor-pointer group"
+                      >
+                        <div className="flex items-center gap-2 md:gap-3">
+                          <span className={`w-5 h-5 md:w-7 md:h-7 flex items-center justify-center text-[10px] md:text-xs font-display ${
+                            index === 0 ? 'bg-primo-yellow text-black' :
+                            index === 1 ? 'bg-gray-300 text-black' :
+                            index === 2 ? 'bg-amber-600 text-black' :
+                            'bg-static-dark text-white'
+                          }`}>
+                            #{index + 1}
+                          </span>
+                          <span className="text-white font-mono text-xs md:text-sm group-hover:text-primo-cyan transition-colors">
+                            {holder.owner.slice(0, 4)}...{holder.owner.slice(-4)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-0.5 md:gap-1 bg-black/50 px-2 md:px-3 py-0.5 md:py-1 border border-primo-cyan/30">
+                          <span className="text-primo-cyan font-display text-base md:text-xl">{holdingCount}</span>
+                          <span className="text-static-gray text-[10px] md:text-xs ml-0.5 md:ml-1">Primos</span>
+                        </div>
+                      </motion.a>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="p-6 text-center text-static-gray font-mono">No holder data available</div>
+              )}
+            </div>
+          </section>
+
+          {/* Recent Activity - Smaller */}
+          <section>
+            <h2 className="font-display text-lg md:text-2xl text-white mb-4 md:mb-6 flex items-center gap-2 md:gap-3">
+              <Zap className="text-primo-pink" size={20} />
+              LIVE ACTIVITY
+              <span className="ml-1 md:ml-2 w-1.5 h-1.5 md:w-2 md:h-2 bg-primo-green rounded-full animate-pulse" />
+            </h2>
+
+            <div className="bg-black border-2 md:border-4 border-white overflow-hidden">
+              {loading ? (
+                <div className="p-4 md:p-6 text-center text-static-gray font-mono text-sm">Loading...</div>
+              ) : recentActivity.length > 0 ? (
+                <div className="divide-y divide-static-dark">
+                  {recentActivity.map((activity, index) => (
+                    <motion.a
+                      key={activity.id}
+                      href={`https://magiceden.io/item-details/${activity.mintAddress}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="p-2 md:p-3 flex items-center justify-between hover:bg-static-dark/50 transition-colors cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-2 md:gap-3">
+                        <div className="w-8 h-8 md:w-10 md:h-10 border-2 border-white/20 overflow-hidden flex-shrink-0">
+                          <img src={activity.image} alt="" className="w-full h-full object-cover" loading="lazy" />
+                        </div>
+
+                        <span className={`px-1.5 md:px-2 py-0.5 text-[10px] md:text-xs font-display ${
+                          activity.type === 'sale' ? 'bg-primo-green text-black' : 'bg-primo-yellow text-black'
+                        }`}>
+                          {activity.type === 'sale' ? 'SOLD' : 'LISTED'}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 md:gap-3">
+                        <span className="text-primo-cyan font-mono text-xs md:text-sm">◎{activity.price}</span>
+                        <span className="text-static-gray text-[10px] md:text-xs">{activity.time}</span>
+                      </div>
+                    </motion.a>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-4 md:p-6 text-center text-static-gray font-mono text-sm">No recent activity</div>
+              )}
+            </div>
+          </section>
+        </div>
+
+        {/* Community Values */}
+        <section className="mb-10 md:mb-16">
+          <h2 className="font-display text-lg md:text-2xl text-white mb-4 md:mb-8 flex items-center gap-2 md:gap-3">
+            <Heart className="text-primo-pink" size={20} />
+            OUR VALUES
           </h2>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {spotlightMembers.filter(m => !m.featured).map((member, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
+            {[
+              {
+                title: 'DIAMOND HANDS',
+                desc: '72% of Primos have never been listed. Our holders believe in the long-term vision.',
+                borderColor: 'border-primo-cyan',
+                textColor: 'text-primo-cyan',
+              },
+              {
+                title: 'COMMUNITY FIRST',
+                desc: 'Every decision is made with the community in mind. We build together.',
+                borderColor: 'border-primo-pink',
+                textColor: 'text-primo-pink',
+              },
+              {
+                title: 'NOSTALGIA',
+                desc: 'We celebrate 90s culture, retro gaming, and the art that defined a generation.',
+                borderColor: 'border-primo-yellow',
+                textColor: 'text-primo-yellow',
+              },
+            ].map((value, index) => (
               <motion.div
-                key={member.username}
+                key={value.title}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -5 }}
-                className="bg-black border-4 border-white p-6 group"
+                className={`bg-black border-2 md:border-4 ${value.borderColor} p-4 md:p-6`}
               >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-16 h-16 border-2 border-primo-cyan overflow-hidden group-hover:border-primo-pink transition-colors">
-                    <img
-                      src={member.avatar}
-                      alt={member.username}
-                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="font-display text-white">{member.username}</h3>
-                    <div className="text-static-gray font-mono text-sm">
-                      {member.primosOwned} Primos
-                    </div>
-                  </div>
-                </div>
-                <p className="text-static-gray text-sm italic mb-4">"{member.quote}"</p>
-                <a
-                  href={member.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-xs text-static-gray hover:text-primo-cyan transition-colors"
-                >
-                  <Twitter size={14} />
-                  @{member.username.toLowerCase()}
-                </a>
+                <h3 className={`font-display text-base md:text-xl ${value.textColor} mb-2 md:mb-3`}>{value.title}</h3>
+                <p className="text-static-gray text-sm md:text-base">{value.desc}</p>
               </motion.div>
             ))}
           </div>
         </section>
 
-        {/* Recent Activity */}
-        <section className="mb-16">
-          <h2 className="font-display text-3xl text-white mb-8 flex items-center gap-3">
-            <Sparkles className="text-primo-pink" />
-            RECENT ACTIVITY
+        {/* From the Community */}
+        <section className="mb-12 md:mb-16">
+          <h2 className="font-display text-xl md:text-2xl text-white mb-6 md:mb-8 flex items-center gap-2 md:gap-3">
+            <Palette className="text-primo-cyan" size={20} />
+            FROM THE COMMUNITY
           </h2>
 
-          <div className="bg-black border-4 border-white overflow-hidden">
-            <div className="divide-y divide-static-dark">
-              {recentActivity.map((activity, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="p-4 flex items-center justify-between hover:bg-static-dark/50 transition-colors"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className={`px-2 py-1 text-xs font-display ${
-                      activity.type === 'sale' ? 'bg-primo-green text-black' :
-                      activity.type === 'list' ? 'bg-primo-yellow text-black' :
-                      'bg-primo-pink text-black'
-                    }`}>
-                      {activity.type.toUpperCase()}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
+            {[
+              {
+                type: 'art',
+                title: 'Primo Pixel Animation',
+                creator: '@PixelArtist3D',
+                image: '/artwork/QmagjfWJXmrStQP7sYsEqytPV2yXtyRhKTcT3Ngqw8D1MA.avif',
+                link: 'https://x.com/primosnft',
+                icon: Frame,
+                borderColor: 'border-primo-pink',
+              },
+              {
+                type: 'merch',
+                title: 'Primo Hoodie Design',
+                creator: '@MerchMaster',
+                image: '/artwork/QmX6ywFVdXwPjjUYcYEqhKMttWmW8ueCzZxHSmj8EKNzbL.avif',
+                link: 'https://x.com/primosnft',
+                icon: Shirt,
+                borderColor: 'border-primo-yellow',
+              },
+              {
+                type: 'art',
+                title: 'Primos Group Portrait',
+                creator: '@NFTCreator',
+                image: '/artwork/QmZUWtRTo4RigUSbPwHWQ93gM6azjP1hZCP2HdCLWdp93g.avif',
+                link: 'https://x.com/primosnft',
+                icon: Frame,
+                borderColor: 'border-primo-cyan',
+              },
+            ].map((item, index) => (
+              <motion.a
+                key={item.title}
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className={`bg-black border-2 md:border-4 ${item.borderColor} overflow-hidden group`}
+              >
+                <div className="aspect-square overflow-hidden">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="p-2 md:p-4">
+                  <div className="flex items-center gap-1.5 md:gap-2 mb-1 md:mb-2">
+                    <item.icon size={12} className="text-white/60 md:w-4 md:h-4" />
+                    <span className="text-white/60 text-[10px] md:text-xs font-mono uppercase">
+                      {item.type}
                     </span>
-                    <span className="text-white font-mono">{activity.user}</span>
-                    <span className="text-static-gray">→</span>
-                    <span className="text-primo-cyan">{activity.item}</span>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-white font-mono">{activity.price}</span>
-                    <span className="text-static-gray text-sm">{activity.time}</span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+                  <h3 className="font-display text-white text-sm md:text-base mb-0.5 md:mb-1 truncate">{item.title}</h3>
+                  <p className="text-primo-cyan text-xs md:text-sm font-mono truncate">{item.creator}</p>
+                </div>
+              </motion.a>
+            ))}
           </div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            className="mt-6 md:mt-8 text-center"
+          >
+            <p className="text-static-gray mb-3 md:mb-4 text-sm md:text-base">
+              Created something cool? Share it with us!
+            </p>
+            <motion.a
+              href="https://discord.gg/XhCcZNfEVn"
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.05 }}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 border border-white/20 text-white font-display hover:bg-white/20 transition-colors"
+            >
+              <MessageCircle size={18} />
+              SUBMIT YOUR CREATION
+            </motion.a>
+          </motion.div>
         </section>
 
         {/* Join CTA */}
@@ -262,7 +380,7 @@ export default function Community() {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <motion.a
-                href="https://discord.gg/primos"
+                href="https://discord.gg/XhCcZNfEVn"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
@@ -273,7 +391,7 @@ export default function Community() {
                 JOIN DISCORD
               </motion.a>
               <motion.a
-                href="https://x.com/PrimosNFT"
+                href="https://x.com/primosnft"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
@@ -282,6 +400,17 @@ export default function Community() {
               >
                 <Twitter size={20} />
                 FOLLOW ON X
+              </motion.a>
+              <motion.a
+                href="https://magiceden.io/marketplace/primos"
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-6 py-3 bg-transparent border-3 border-primo-yellow text-primo-yellow font-display tracking-wider hover:bg-primo-yellow hover:text-black transition-colors flex items-center gap-2"
+              >
+                <ExternalLink size={20} />
+                BUY ON MAGIC EDEN
               </motion.a>
             </div>
           </div>
