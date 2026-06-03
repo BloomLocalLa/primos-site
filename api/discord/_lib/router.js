@@ -34,8 +34,11 @@ async function handleCommand(interaction, deps) {
   const data = interaction.data
   switch (data.name) {
     case 'stats': {
-      const stats = await deps.getCollectionStats(config.COLLECTION_SYMBOL)
-      const holders = await deps.getHolderCount(config.COLLECTION_SYMBOL)
+      // Fetch in parallel so we stay well under Discord's 3s interaction-response limit.
+      const [stats, holders] = await Promise.all([
+        deps.getCollectionStats(config.COLLECTION_SYMBOL),
+        deps.getHolderCount(config.COLLECTION_SYMBOL),
+      ])
       return { type: 4, data: { embeds: [buildStatsEmbed({ ...stats, holders })] } }
     }
     case 'announce': {
@@ -83,8 +86,9 @@ async function handleComponent(interaction, deps) {
       try {
         await deps.editMessage(config.LINKS_CHANNEL_ID, stored.id, { embeds: [previewEmbed] })
         return { type: 7, data: { content: '✅ Official links updated.', embeds: [], components: [] } }
-      } catch {
-        // stored message was deleted — fall through to repost
+      } catch (err) {
+        // stored message was deleted or unreachable — log and fall through to repost
+        console.error('links edit failed, reposting:', err)
       }
     }
     const posted = await deps.postMessage(config.LINKS_CHANNEL_ID, { embeds: [previewEmbed] })
