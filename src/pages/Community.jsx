@@ -4,6 +4,9 @@ import { Twitter, MessageCircle, Heart, Users, Zap, TrendingUp, Package, Externa
 import GlitchText from '../components/GlitchText'
 import { getCollectionStats, getRecentActivities, getHolderStats, lamportsToSol } from '../lib/magiceden'
 
+// Public IPFS gateways are unreliable for activity images; fall back to local artwork
+const FALLBACK_ARTWORK = '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif'
+
 export default function Community() {
   const [stats, setStats] = useState(null)
   const [recentActivity, setRecentActivity] = useState([])
@@ -38,7 +41,7 @@ export default function Community() {
           .filter(a => a.type === 'buyNow' || a.type === 'list')
           .slice(0, 5)
           .map((activity, i) => {
-            let imageUrl = activity.image || '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif'
+            let imageUrl = activity.image || FALLBACK_ARTWORK
             if (imageUrl.startsWith('ipfs://')) {
               imageUrl = imageUrl.replace('ipfs://', 'https://nftstorage.link/ipfs/')
             }
@@ -209,7 +212,13 @@ export default function Community() {
                     >
                       <div className="flex items-center gap-2 md:gap-3">
                         <div className="w-8 h-8 md:w-10 md:h-10 border-2 border-white/20 overflow-hidden flex-shrink-0">
-                          <img src={activity.image} alt="" className="w-full h-full object-cover" loading="lazy" />
+                          <img
+                            src={activity.image}
+                            alt=""
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = FALLBACK_ARTWORK }}
+                          />
                         </div>
 
                         <span className={`px-1.5 md:px-2 py-0.5 text-[10px] md:text-xs font-display ${
