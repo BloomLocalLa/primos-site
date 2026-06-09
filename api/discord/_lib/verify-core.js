@@ -1,4 +1,4 @@
-import { tierFor } from './tiers.js'
+import { tierFor, tiersFor } from './tiers.js'
 import { reconcileTierRole } from './assign.js'
 import { buildChallengeMessage } from './challenge.js'
 
@@ -71,9 +71,10 @@ export async function completeVerification({ nonceId, wallet, signature, now = D
     walletCount,
     total,
     walletsLinked: wallets.length,
-    tier: tier ? tier.name : null,
+    tier: tier ? tier.name : null, // highest tier (headline)
     tierKey: tier ? tier.key : null,
-    roleAssigned: result.targetRoleId,
+    tiers: tiersFor(total).map((t) => t.name), // all qualifying tier names (roles stack)
+    rolesAdded: result.added,
     rolesRemoved: result.removed,
   }
 }

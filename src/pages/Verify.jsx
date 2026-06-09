@@ -148,7 +148,8 @@ export default function Verify() {
                 This wallet holds <span className="font-bold text-primo-yellow">{result.walletCount}</span> Primos.
                 {' '}You now hold <span className="font-bold text-primo-yellow">{result.total}</span> across{' '}
                 <span className="font-bold">{result.walletsLinked}</span> wallet{result.walletsLinked === 1 ? '' : 's'} —
-                {' '}role: <span className="font-bold text-primo-pink">{result.tier}</span>. Head back to Discord!
+                {' '}role{result.tiers && result.tiers.length > 1 ? 's' : ''}:{' '}
+                <span className="font-bold text-primo-pink">{[...(result.tiers || [])].reverse().join(', ')}</span>. Head back to Discord!
               </p>
             ) : (
               <p className="text-white/80">

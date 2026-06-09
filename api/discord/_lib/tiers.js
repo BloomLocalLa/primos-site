@@ -13,10 +13,18 @@ export const TIERS = [
   { key: 'PRIMO', name: 'Primo', min: 1, configKey: 'TIER_ROLE_PRIMO' },
 ]
 
-// The single tier for a given hold-count, or null if they hold none.
+// The highest single tier for a given hold-count (used for the headline display),
+// or null if they hold none.
 export function tierFor(count) {
   const n = Number(count) || 0
   return TIERS.find((t) => n >= t.min) || null
+}
+
+// EVERY tier a hold-count qualifies for (count >= min), highest-first. Roles stack:
+// 25 Primos qualifies for Primo + Compadre + Tío + El Jefe.
+export function tiersFor(count) {
+  const n = Number(count) || 0
+  return TIERS.filter((t) => n >= t.min)
 }
 
 // Map of tierKey -> roleId from config (e.g. { ELJEFE: '123', ... }).

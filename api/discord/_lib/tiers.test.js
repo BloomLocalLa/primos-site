@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { tierFor, tierRoleIds, allTierRoleIds, TIERS } from './tiers.js'
+import { tierFor, tiersFor, tierRoleIds, allTierRoleIds, TIERS } from './tiers.js'
 
 describe('tierFor (highest-only)', () => {
   it('returns null below the entry threshold', () => {
@@ -22,6 +22,16 @@ describe('tierFor (highest-only)', () => {
     expect(tierFor(undefined)).toBeNull()
     expect(tierFor(null)).toBeNull()
     expect(tierFor('not a number')).toBeNull()
+  })
+})
+
+describe('tiersFor (stacked — all qualifying tiers)', () => {
+  it('returns every tier the count qualifies for, highest-first', () => {
+    expect(tiersFor(25).map((t) => t.key)).toEqual(['ELJEFE', 'TIO', 'COMPADRE', 'PRIMO'])
+    expect(tiersFor(10).map((t) => t.key)).toEqual(['TIO', 'COMPADRE', 'PRIMO'])
+    expect(tiersFor(5).map((t) => t.key)).toEqual(['COMPADRE', 'PRIMO'])
+    expect(tiersFor(1).map((t) => t.key)).toEqual(['PRIMO'])
+    expect(tiersFor(0)).toEqual([])
   })
 })
 

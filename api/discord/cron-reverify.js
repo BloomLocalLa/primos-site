@@ -60,7 +60,7 @@ export default async function handler(req, res) {
       try {
         const r = await recheckUser({ discordUserId, wallets: byUser.get(discordUserId) }, deps)
         if (r.left || r.tierKey === null) dropped++
-        else if (r.added || (r.removed && r.removed.length)) changed++
+        else if ((r.added && r.added.length) || (r.removed && r.removed.length)) changed++
       } catch (e) {
         console.error('reverify failed for', discordUserId, e)
       }

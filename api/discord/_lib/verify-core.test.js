@@ -45,23 +45,28 @@ describe('buildChallenge', () => {
 })
 
 describe('completeVerification (multi-wallet)', () => {
-  it('happy path: links the wallet, sums, assigns tier, burns nonce', async () => {
+  it('happy path: links the wallet, sums, stacks tier roles, burns nonce', async () => {
     const deps = baseDeps()
     const r = await completeVerification({ nonceId: 'n1', wallet: 'W', signature: 'S', now: NOW }, deps)
-    expect(r).toMatchObject({ ok: true, walletCount: 5, total: 5, walletsLinked: 1, tier: 'Compadre', tierKey: 'COMPADRE', roleAssigned: 'c' })
+    expect(r).toMatchObject({ ok: true, walletCount: 5, total: 5, walletsLinked: 1, tier: 'Compadre', tierKey: 'COMPADRE' })
+    expect(r.tiers).toEqual(['Compadre', 'Primo']) // 5 qualifies for both
     expect(deps.upsertVerification).toHaveBeenCalledWith({ discordUserId: 'u1', wallet: 'W', count: 5 })
     expect(deps.addGuildMemberRole).toHaveBeenCalledWith('g1', 'u1', 'c')
+    expect(deps.addGuildMemberRole).toHaveBeenCalledWith('g1', 'u1', 'p')
     expect(deps.markNonceUsed).toHaveBeenCalledWith('n1')
   })
 
-  it('aggregates holdings across all the member\'s wallets', async () => {
+  it('aggregates across wallets and stacks every qualifying role', async () => {
     const deps = baseDeps({
       countPrimos: vi.fn().mockResolvedValue(3), // this wallet
       listWalletsForUser: vi.fn().mockResolvedValue([{ wallet: 'W', count: 3 }, { wallet: 'W2', count: 7 }]),
     })
     const r = await completeVerification({ nonceId: 'n1', wallet: 'W', signature: 'S', now: NOW }, deps)
     expect(r).toMatchObject({ ok: true, walletCount: 3, total: 10, walletsLinked: 2, tierKey: 'TIO' })
-    expect(deps.addGuildMemberRole).toHaveBeenCalledWith('g1', 'u1', 't') // Tío from the 10 total
+    expect(r.tiers).toEqual(['Tío', 'Compadre', 'Primo']) // 10 → all three
+    expect(deps.addGuildMemberRole).toHaveBeenCalledWith('g1', 'u1', 't')
+    expect(deps.addGuildMemberRole).toHaveBeenCalledWith('g1', 'u1', 'c')
+    expect(deps.addGuildMemberRole).toHaveBeenCalledWith('g1', 'u1', 'p')
   })
 
   it('rejects a bad signature without linking or burning the nonce', async () => {
@@ -129,13 +134,15 @@ describe('recheckUser (nightly cron)', () => {
     expect(r).toMatchObject({ total: 0, tierKey: null })
   })
 
-  it('sums multiple wallets and reconciles the tier', async () => {
+  it('sums multiple wallets and stacks the qualifying roles', async () => {
     const countPrimos = vi.fn().mockResolvedValueOnce(4).mockResolvedValueOnce(6)
     const deps = baseDeps({ countPrimos, getGuildMember: vi.fn().mockResolvedValue({ roles: ['c'] }) })
     const r = await recheckUser({ discordUserId: 'u1', wallets: [{ wallet: 'W1', count: 4 }, { wallet: 'W2', count: 6 }], now: NOW }, deps)
     expect(r).toMatchObject({ total: 10, tierKey: 'TIO' })
+    // total 10 qualifies for p,c,t; member has c → add p and t, remove nothing
     expect(deps.addGuildMemberRole).toHaveBeenCalledWith('g1', 'u1', 't')
-    expect(deps.removeGuildMemberRole).toHaveBeenCalledWith('g1', 'u1', 'c')
+    expect(deps.addGuildMemberRole).toHaveBeenCalledWith('g1', 'u1', 'p')
+    expect(deps.removeGuildMemberRole).not.toHaveBeenCalled()
     expect(deps.upsertVerification).toHaveBeenCalledTimes(2)
     expect(deps.deleteForUser).not.toHaveBeenCalled()
   })
