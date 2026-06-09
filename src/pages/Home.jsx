@@ -61,7 +61,7 @@ export default function Home() {
         // Fetch stats, listings, and activities in parallel
         const [statsData, listings, activities] = await Promise.all([
           getCollectionStats(),
-          getListedNFTs(0, 200),
+          getListedNFTs(0, 100), // Magic Eden caps listings page size at 100
           getRecentActivities(100),
         ])
 
@@ -133,7 +133,7 @@ export default function Home() {
           .map((sale, i) => ({
             id: i,
             name: sale.tokenMint?.slice(0, 8) + '...',
-            price: (sale.price / 1e9).toFixed(3),
+            price: (sale.price || 0).toFixed(3), // activities price is already in SOL, not lamports
             time: new Date(sale.blockTime * 1000).toLocaleTimeString(),
             buyer: sale.buyer?.slice(0, 4) + '...' + sale.buyer?.slice(-4),
           }))

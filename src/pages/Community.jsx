@@ -46,7 +46,7 @@ export default function Community() {
             return {
               id: i,
               type: activity.type === 'buyNow' ? 'sale' : 'list',
-              price: (activity.price / 1e9).toFixed(3),
+              price: (activity.price || 0).toFixed(3), // activities price is already in SOL, not lamports
               time: getTimeAgo(activity.blockTime * 1000),
               buyer: activity.buyer?.slice(0, 4) + '...' + activity.buyer?.slice(-4),
               seller: activity.seller?.slice(0, 4) + '...' + activity.seller?.slice(-4),
