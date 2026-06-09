@@ -5,6 +5,7 @@ on:
     - cron: '*/5 * * * *'   # sales alerts (every 5 min)
     - cron: '0 16 * * *'    # daily stats (16:00 UTC)
     - cron: '0 * * * *'     # reminders (hourly)
+    - cron: '15 * * * *'    # holder re-verify (hourly at :15, cursor-paced)
   workflow_dispatch: {}
 
 jobs:
@@ -31,3 +32,11 @@ jobs:
       - run: |
           curl -fsS -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             "${{ secrets.VERCEL_BASE_URL }}/api/discord/cron-reminders"
+
+  reverify:
+    if: github.event.schedule == '15 * * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -fsS -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.VERCEL_BASE_URL }}/api/discord/cron-reverify"

@@ -25,6 +25,8 @@ const commands = [
       { name: 'as_embed', description: 'Send as an embed?', type: 5, required: false },
     ],
   },
+  // Public: every member can run /verify (no default_member_permissions gate).
+  { name: 'verify', description: 'Verify your Primos holdings to claim your holder tier role' },
 ]
 
 const res = await fetch(

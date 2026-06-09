@@ -1,9 +1,11 @@
-import { loadConfig } from './_lib/config.js'
+import { loadConfig, assertVerifyConfig } from './_lib/config.js'
 import { verifyDiscordSignature } from './_lib/verify.js'
 import { handleInteraction } from './_lib/router.js'
 import { postMessage, editMessage } from './_lib/rest.js'
 import { getCollectionStats, getHolderCount } from './_lib/magiceden.js'
 import { getState, setState } from './_lib/state.js'
+import { createNonce } from './_lib/holders.js'
+import crypto from 'node:crypto'
 
 function readRawBody(req) {
   return new Promise((resolve, reject) => {
@@ -35,6 +37,16 @@ export default async function handler(req, res) {
     getHolderCount,
     getState,
     setState,
+    // Build a one-time, 10-minute verification link bound to this Discord user.
+    // Returns null (→ "not live yet") until the Helius/tier-role env is set.
+    createVerifyLink: async (discordUserId) => {
+      try { assertVerifyConfig(config) } catch { return null }
+      if (!discordUserId) return null
+      const nonce = crypto.randomBytes(16).toString('hex')
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString()
+      const row = await createNonce({ discordUserId, nonce, expiresAt })
+      return `${config.PUBLIC_BASE_URL}/verify?t=${row.id}`
+    },
   }
 
   try {

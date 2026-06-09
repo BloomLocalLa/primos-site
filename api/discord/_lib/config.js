@@ -23,5 +23,31 @@ export function loadConfig(env = process.env) {
     SUPABASE_URL: env.SUPABASE_URL,
     SUPABASE_SERVICE_ROLE_KEY: env.SUPABASE_SERVICE_ROLE_KEY,
     COLLECTION_SYMBOL: env.VITE_COLLECTION_SYMBOL || 'primos',
+    // Holder verification (custom Helius bot). Optional at load time so existing
+    // handlers keep working before these are set; the verify endpoints assert the
+    // ones they need themselves (see assertVerifyConfig).
+    HELIUS_API_KEY: env.HELIUS_API_KEY,
+    PRIMOS_COLLECTION_ADDRESS: env.PRIMOS_COLLECTION_ADDRESS,
+    TIER_ROLE_PRIMO: env.TIER_ROLE_PRIMO,
+    TIER_ROLE_COMPADRE: env.TIER_ROLE_COMPADRE,
+    TIER_ROLE_TIO: env.TIER_ROLE_TIO,
+    TIER_ROLE_ELJEFE: env.TIER_ROLE_ELJEFE,
+    PUBLIC_BASE_URL: env.PUBLIC_BASE_URL || 'https://primos-site.vercel.app',
   }
+}
+
+// Verify endpoints need extra env the base bot doesn't. Call this at the top of
+// those handlers so a misconfiguration fails loudly instead of silently skipping
+// role assignment.
+const VERIFY_REQUIRED = [
+  'HELIUS_API_KEY', 'PRIMOS_COLLECTION_ADDRESS',
+  'TIER_ROLE_PRIMO', 'TIER_ROLE_COMPADRE', 'TIER_ROLE_TIO', 'TIER_ROLE_ELJEFE',
+]
+
+export function assertVerifyConfig(config) {
+  const missing = VERIFY_REQUIRED.filter((k) => !config[k])
+  if (missing.length) {
+    throw new Error(`Holder verification not configured — missing: ${missing.join(', ')}`)
+  }
+  return config
 }

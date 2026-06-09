@@ -15,6 +15,7 @@ function baseDeps(over = {}) {
     getHolderCount: vi.fn().mockResolvedValue(300),
     getState: vi.fn().mockResolvedValue(null),
     setState: vi.fn().mockResolvedValue(undefined),
+    createVerifyLink: vi.fn().mockResolvedValue('https://primos-site.vercel.app/verify?t=abc'),
     ...over,
   }
 }
@@ -32,6 +33,23 @@ describe('handleInteraction', () => {
       { type: 2, member: nonMod, data: { name: 'stats' } }, baseDeps())
     expect(r.data.flags).toBe(64)
     expect(r.data.content).toMatch(/permission/i)
+  })
+
+  it('/verify is public — a non-mod gets an ephemeral verify link', async () => {
+    const deps = baseDeps()
+    const r = await handleInteraction(
+      { type: 2, member: { ...nonMod, user: { id: 'u9' } }, data: { name: 'verify' } }, deps)
+    expect(deps.createVerifyLink).toHaveBeenCalledWith('u9')
+    expect(r.type).toBe(4)
+    expect(r.data.flags).toBe(64)
+    expect(r.data.content).toContain('/verify?t=abc')
+  })
+
+  it('/verify replies "not live yet" when verification is unconfigured', async () => {
+    const deps = baseDeps({ createVerifyLink: vi.fn().mockResolvedValue(null) })
+    const r = await handleInteraction(
+      { type: 2, member: { ...nonMod, user: { id: 'u9' } }, data: { name: 'verify' } }, deps)
+    expect(r.data.content).toMatch(/live yet|check back/i)
   })
 
   it('/stats fetches and returns a stats embed directly', async () => {

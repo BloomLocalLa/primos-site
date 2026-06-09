@@ -16,6 +16,7 @@ import Community from './pages/Community'
 import Merch from './pages/Merch'
 import Artwork from './pages/Artwork'
 import FAQ from './pages/FAQ'
+import Verify from './pages/Verify'
 
 // Cart Context
 export const CartContext = createContext()
@@ -79,6 +80,7 @@ function App() {
               <Route path="/merch" element={<Merch />} />
               <Route path="/artwork" element={<Artwork />} />
               <Route path="/faq" element={<FAQ />} />
+              <Route path="/verify" element={<Verify />} />
             </Routes>
           </AnimatePresence>
         </main>

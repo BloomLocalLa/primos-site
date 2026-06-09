@@ -28,10 +28,25 @@ function previewWith(embed, confirmId, note) {
 
 async function handleCommand(interaction, deps) {
   const { config } = deps
+  const data = interaction.data
+
+  // /verify is PUBLIC — any member can link their wallet to claim a tier role.
+  if (data.name === 'verify') {
+    const userId = interaction.member?.user?.id || interaction.user?.id
+    const link = await deps.createVerifyLink(userId)
+    if (!link) return ephemeral('🛠️ Holder verification isn’t live yet — check back soon.')
+    return ephemeral(
+      '🔗 **Verify your Primos holdings**\n' +
+      'Connect your wallet and sign (free — no transaction) to claim your tier ' +
+      '(**Primo / Compadre / Tío / El Jefe**):\n' + link + '\n\n' +
+      '_Link expires in 10 minutes and only works for you._',
+    )
+  }
+
+  // Everything below is mod-only.
   if (!isAuthorized(interaction.member, config.MOD_ROLE_ID)) {
     return ephemeral('🚫 You do not have permission to use this command.')
   }
-  const data = interaction.data
   switch (data.name) {
     case 'stats': {
       // Fetch in parallel so we stay well under Discord's 3s interaction-response limit.

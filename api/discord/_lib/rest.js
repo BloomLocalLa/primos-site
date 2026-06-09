@@ -13,6 +13,8 @@ async function discordFetch(path, { method, token, body, fetchImpl = fetch }) {
     const detail = await res.text().catch(() => '')
     throw new Error(`Discord ${method} ${path} failed: ${res.status} ${detail}`)
   }
+  // Role add/remove return 204 No Content; messages return JSON.
+  if (res.status === 204) return null
   return res.json()
 }
 
@@ -22,4 +24,16 @@ export function postMessage(channelId, payload, { token, fetchImpl } = {}) {
 
 export function editMessage(channelId, messageId, payload, { token, fetchImpl } = {}) {
   return discordFetch(`/channels/${channelId}/messages/${messageId}`, { method: 'PATCH', token, body: payload, fetchImpl })
+}
+
+export function getGuildMember(guildId, userId, { token, fetchImpl } = {}) {
+  return discordFetch(`/guilds/${guildId}/members/${userId}`, { method: 'GET', token, fetchImpl })
+}
+
+export function addGuildMemberRole(guildId, userId, roleId, { token, fetchImpl } = {}) {
+  return discordFetch(`/guilds/${guildId}/members/${userId}/roles/${roleId}`, { method: 'PUT', token, fetchImpl })
+}
+
+export function removeGuildMemberRole(guildId, userId, roleId, { token, fetchImpl } = {}) {
+  return discordFetch(`/guilds/${guildId}/members/${userId}/roles/${roleId}`, { method: 'DELETE', token, fetchImpl })
 }
