@@ -5,6 +5,11 @@ describe('isCronAuthorized', () => {
   it('accepts a matching bearer token', () => {
     expect(isCronAuthorized({ authorization: 'Bearer s3cret' }, 's3cret')).toBe(true)
   })
+  it('tolerates stray whitespace/newlines on the secret or header', () => {
+    expect(isCronAuthorized({ authorization: 'Bearer s3cret' }, 's3cret\n')).toBe(true)
+    expect(isCronAuthorized({ authorization: 'Bearer s3cret\n' }, 's3cret')).toBe(true)
+    expect(isCronAuthorized({ authorization: 'Bearer  s3cret  ' }, '  s3cret  ')).toBe(true)
+  })
   it('rejects a wrong bearer token', () => {
     expect(isCronAuthorized({ authorization: 'Bearer nope' }, 's3cret')).toBe(false)
   })
