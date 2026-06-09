@@ -9,7 +9,7 @@ export function loadConfig(env = process.env) {
   for (const key of REQUIRED) {
     if (!env[key]) throw new Error(`Missing required environment variable: ${key}`)
   }
-  return {
+  const config = {
     BOT_TOKEN: env.DISCORD_BOT_TOKEN,
     PUBLIC_KEY: env.DISCORD_PUBLIC_KEY,
     APP_ID: env.DISCORD_APP_ID,
@@ -34,6 +34,12 @@ export function loadConfig(env = process.env) {
     TIER_ROLE_ELJEFE: env.TIER_ROLE_ELJEFE,
     PUBLIC_BASE_URL: env.PUBLIC_BASE_URL || 'https://primos-site.vercel.app',
   }
+  // Trim stray whitespace — a trailing newline on a pasted token/secret/ID is a
+  // classic cause of silent 401s.
+  for (const k of Object.keys(config)) {
+    if (typeof config[k] === 'string') config[k] = config[k].trim()
+  }
+  return config
 }
 
 // Verify endpoints need extra env the base bot doesn't. Call this at the top of
