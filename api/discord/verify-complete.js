@@ -1,6 +1,6 @@
 import { loadConfig, assertVerifyConfig } from './_lib/config.js'
 import {
-  getNonce, getVerificationByWallet, upsertVerification, markNonceUsed,
+  getNonce, getVerificationByWallet, upsertVerification, markNonceUsed, listWalletsForUser,
 } from './_lib/holders.js'
 import { verifyWalletSignature } from './_lib/wallet.js'
 import { countPrimos } from './_lib/helius.js'
@@ -32,6 +32,7 @@ export default async function handler(req, res) {
       getNonce,
       verifyWalletSignature,
       getVerificationByWallet,
+      listWalletsForUser,
       countPrimos: (w) => countPrimos(w, { apiKey: config.HELIUS_API_KEY, collection: config.PRIMOS_COLLECTION_ADDRESS }),
       getGuildMember: (g, u) => getGuildMember(g, u, { token: config.BOT_TOKEN }),
       addGuildMemberRole: (g, u, r) => addGuildMemberRole(g, u, r, { token: config.BOT_TOKEN }),

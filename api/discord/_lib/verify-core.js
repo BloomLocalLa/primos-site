@@ -47,25 +47,30 @@ export async function completeVerification({ nonceId, wallet, signature, now = D
     return { ok: false, reason: 'wallet_taken' }
   }
 
-  const count = await deps.countPrimos(wallet)
-  const tier = tierFor(count)
+  // Link/refresh this wallet, then total Primos across ALL the member's wallets.
+  const walletCount = await deps.countPrimos(wallet)
+  await deps.upsertVerification({ discordUserId, wallet, count: walletCount })
+  const wallets = await deps.listWalletsForUser(discordUserId)
+  const total = wallets.reduce((sum, w) => sum + (w.count || 0), 0)
+  const tier = tierFor(total)
 
   // Member may have left the server between /verify and signing — tolerate it.
   const member = await deps.getGuildMember(config.GUILD_ID, discordUserId).catch(() => null)
   const result = await reconcileTierRole(
-    { currentRoleIds: member?.roles || [], count, config },
+    { currentRoleIds: member?.roles || [], count: total, config },
     {
       addRole: (roleId) => deps.addGuildMemberRole(config.GUILD_ID, discordUserId, roleId),
       removeRole: (roleId) => deps.removeGuildMemberRole(config.GUILD_ID, discordUserId, roleId),
     },
   )
 
-  await deps.upsertVerification({ discordUserId, wallet, count, tier: tier ? tier.key : null })
   await deps.markNonceUsed(nonceId)
 
   return {
     ok: true,
-    count,
+    walletCount,
+    total,
+    walletsLinked: wallets.length,
     tier: tier ? tier.name : null,
     tierKey: tier ? tier.key : null,
     roleAssigned: result.targetRoleId,
@@ -73,37 +78,38 @@ export async function completeVerification({ nonceId, wallet, signature, now = D
   }
 }
 
-// Re-check one already-linked wallet (used by the nightly cron). Returns the new
-// tier/count and what changed, so the caller can log/aggregate.
-export async function recheckHolder({ record, now = Date.now() }, deps) {
+// Re-check ALL of a member's wallets (used by the nightly cron). Re-counts each,
+// drops emptied wallets, sums the rest, and reconciles the member's tier role
+// from the total. Returns what changed for logging.
+export async function recheckUser({ discordUserId, wallets, now = Date.now() }, deps) {
   const { config } = deps
-  const discordUserId = record.discord_user_id
-  const count = await deps.countPrimos(record.wallet)
-  const tier = tierFor(count)
 
+  // Left the server? Drop all their wallets and skip the Helius calls.
   const member = await deps.getGuildMember(config.GUILD_ID, discordUserId).catch(() => null)
   if (!member) {
-    // They left the server; drop the stale link so we stop re-checking it.
-    await deps.deleteVerification(discordUserId)
-    return { discordUserId, left: true, count }
+    await deps.deleteForUser(discordUserId)
+    return { discordUserId, left: true }
   }
 
+  let total = 0
+  for (const w of wallets) {
+    const c = await deps.countPrimos(w.wallet)
+    if (c <= 0) {
+      await deps.deleteWallet(w.wallet) // forget emptied wallets
+    } else {
+      total += c
+      await deps.upsertVerification({ discordUserId, wallet: w.wallet, count: c, verifiedAt: new Date(now).toISOString() })
+    }
+  }
+
+  const tier = tierFor(total)
   const result = await reconcileTierRole(
-    { currentRoleIds: member.roles || [], count, config },
+    { currentRoleIds: member.roles || [], count: total, config },
     {
       addRole: (roleId) => deps.addGuildMemberRole(config.GUILD_ID, discordUserId, roleId),
       removeRole: (roleId) => deps.removeGuildMemberRole(config.GUILD_ID, discordUserId, roleId),
     },
   )
 
-  if (count <= 0) {
-    // No longer a holder — forget them (roles already stripped above).
-    await deps.deleteVerification(discordUserId)
-  } else {
-    await deps.upsertVerification({
-      discordUserId, wallet: record.wallet, count, tier: tier ? tier.key : null, verifiedAt: new Date(now).toISOString(),
-    })
-  }
-
-  return { discordUserId, count, tierKey: tier ? tier.key : null, added: result.added, removed: result.removed }
+  return { discordUserId, total, tierKey: tier ? tier.key : null, added: result.added, removed: result.removed }
 }

@@ -142,17 +142,22 @@ export default function Verify() {
 
         {phase === 'success' && result && (
           <div className="border border-primo-green bg-primo-green/10 rounded p-5 text-center">
-            <div className="text-2xl font-black text-primo-green mb-1">✅ Verified!</div>
+            <div className="text-2xl font-black text-primo-green mb-2">✅ Verified!</div>
             {result.tier ? (
               <p className="text-white">
-                You hold <span className="font-bold text-primo-yellow">{result.count}</span> Primos —
-                role assigned: <span className="font-bold text-primo-pink">{result.tier}</span>. Head back to Discord!
+                This wallet holds <span className="font-bold text-primo-yellow">{result.walletCount}</span> Primos.
+                {' '}You now hold <span className="font-bold text-primo-yellow">{result.total}</span> across{' '}
+                <span className="font-bold">{result.walletsLinked}</span> wallet{result.walletsLinked === 1 ? '' : 's'} —
+                {' '}role: <span className="font-bold text-primo-pink">{result.tier}</span>. Head back to Discord!
               </p>
             ) : (
               <p className="text-white/80">
-                Wallet linked, but it holds no Primos right now, so no tier role was given. Grab a Primo and run /verify again!
+                Wallet linked, but you hold no Primos across your wallets right now, so no tier role was given.
               </p>
             )}
+            <p className="text-xs text-primo-cyan mt-3">
+              Have more wallets? Run <span className="font-mono">/verify</span> again with each — holdings combine.
+            </p>
           </div>
         )}
       </div>

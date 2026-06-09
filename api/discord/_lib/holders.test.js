@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   createNonce, getNonce, markNonceUsed,
-  getVerificationByWallet, upsertVerification, listVerifications, deleteVerification,
+  getVerificationByWallet, upsertVerification, listWalletsForUser, listVerifications, deleteWallet, deleteForUser,
 } from './holders.js'
 
 // Chainable Supabase fake: every builder method returns the builder; terminal
@@ -58,14 +58,21 @@ describe('verifications', () => {
     expect(client.calls).toContainEqual(['eq', 'wallet', 'W'])
   })
 
-  it('upsertVerification upserts on discord_user_id', async () => {
+  it('upsertVerification upserts on wallet (one row per wallet)', async () => {
     const client = fakeClient({ error: null })
-    await upsertVerification({ discordUserId: 'u1', wallet: 'W', count: 7, tier: 'TIO', verifiedAt: 'T' }, client)
+    await upsertVerification({ discordUserId: 'u1', wallet: 'W', count: 7, verifiedAt: 'T' }, client)
     expect(client.calls).toContainEqual([
       'upsert',
-      { discord_user_id: 'u1', wallet: 'W', count: 7, tier: 'TIO', verified_at: 'T' },
-      { onConflict: 'discord_user_id' },
+      { wallet: 'W', discord_user_id: 'u1', count: 7, verified_at: 'T' },
+      { onConflict: 'wallet' },
     ])
+  })
+
+  it('listWalletsForUser returns every wallet for a member', async () => {
+    const client = fakeClient({ data: [{ wallet: 'W1', count: 3 }, { wallet: 'W2', count: 7 }], error: null })
+    const rows = await listWalletsForUser('u1', client)
+    expect(rows).toHaveLength(2)
+    expect(client.calls).toContainEqual(['eq', 'discord_user_id', 'u1'])
   })
 
   it('listVerifications returns the array (or empty)', async () => {
@@ -73,10 +80,12 @@ describe('verifications', () => {
     expect(await listVerifications(fakeClient({ data: null, error: null }))).toEqual([])
   })
 
-  it('deleteVerification deletes by discord id', async () => {
-    const client = fakeClient({ error: null })
-    await deleteVerification('u1', client)
-    expect(client.calls).toContainEqual(['delete'])
-    expect(client.calls).toContainEqual(['eq', 'discord_user_id', 'u1'])
+  it('deleteWallet deletes by wallet; deleteForUser by discord id', async () => {
+    const c1 = fakeClient({ error: null })
+    await deleteWallet('W', c1)
+    expect(c1.calls).toContainEqual(['eq', 'wallet', 'W'])
+    const c2 = fakeClient({ error: null })
+    await deleteForUser('u1', c2)
+    expect(c2.calls).toContainEqual(['eq', 'discord_user_id', 'u1'])
   })
 })
