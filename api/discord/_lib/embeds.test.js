@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildStatsEmbed, buildAnnounceEmbed, buildLinksEmbed, buildSaleEmbed } from './embeds.js'
+import { buildStatsEmbed, buildAnnounceEmbed, buildLinksEmbed, buildSaleEmbed, buildVerifyPanelEmbed, verifyPanelComponents } from './embeds.js'
 
 describe('embeds', () => {
   it('buildStatsEmbed includes floor, listed, volume, holders', () => {
@@ -37,5 +37,17 @@ describe('embeds', () => {
     const text = JSON.stringify(e)
     expect(text).toContain('0.05')
     expect(text).toContain('MINT123')
+  })
+
+  it('buildVerifyPanelEmbed lists the tiers and a verify CTA', () => {
+    const text = JSON.stringify(buildVerifyPanelEmbed())
+    expect(text).toContain('Verify')
+    expect(text).toContain('Primo')
+    expect(text).toContain('El Jefe')
+  })
+
+  it('verifyPanelComponents exposes a public verify_start button', () => {
+    const rows = verifyPanelComponents()
+    expect(rows[0].components[0].custom_id).toBe('verify_start')
   })
 })

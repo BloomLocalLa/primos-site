@@ -52,6 +52,33 @@ describe('handleInteraction', () => {
     expect(r.data.content).toMatch(/live yet|check back/i)
   })
 
+  it('verify-panel button is public — a non-mod clicker gets a private link', async () => {
+    const deps = baseDeps()
+    const r = await handleInteraction(
+      { type: 3, member: { ...nonMod, user: { id: 'u9' } }, data: { custom_id: 'verify_start' } }, deps)
+    expect(deps.createVerifyLink).toHaveBeenCalledWith('u9')
+    expect(r.type).toBe(4)
+    expect(r.data.flags).toBe(64)
+    expect(r.data.content).toContain('/verify?t=abc')
+  })
+
+  it('/verifypanel (mod) posts the panel embed + button to the channel', async () => {
+    const deps = baseDeps()
+    const r = await handleInteraction(
+      { type: 2, member: mod, channel_id: 'chanV', data: { name: 'verifypanel' } }, deps)
+    const [chan, payload] = deps.postMessage.mock.calls[0]
+    expect(chan).toBe('chanV')
+    expect(payload.embeds[0].title).toMatch(/verify/i)
+    expect(payload.components[0].components[0].custom_id).toBe('verify_start')
+    expect(r.data.content).toMatch(/panel posted/i)
+  })
+
+  it('/verifypanel is mod-gated', async () => {
+    const r = await handleInteraction(
+      { type: 2, member: nonMod, channel_id: 'chanV', data: { name: 'verifypanel' } }, baseDeps())
+    expect(r.data.content).toMatch(/permission/i)
+  })
+
   it('/stats fetches and returns a stats embed directly', async () => {
     const deps = baseDeps()
     const r = await handleInteraction({ type: 2, member: mod, data: { name: 'stats' } }, deps)

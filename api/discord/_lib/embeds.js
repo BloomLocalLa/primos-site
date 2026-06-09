@@ -36,6 +36,33 @@ export function buildLinksEmbed() {
   }
 }
 
+export function buildVerifyPanelEmbed() {
+  return {
+    title: '✅ Verify Your Primos',
+    color: PRIMO_PINK,
+    description:
+      'Hold Primos? Tap **Verify Wallet** below to claim your holder role.\n\n' +
+      'You’ll connect your Solana wallet and **sign a message** to prove ownership — ' +
+      'it’s free, instant, and **never moves your NFTs or funds**.\n\n' +
+      '**Holder tiers**\n' +
+      '🟢 **Primo** — 1+ Primos\n' +
+      '🔵 **Compadre** — 5+\n' +
+      '🟣 **Tío** — 10+\n' +
+      '👑 **El Jefe** — 25+\n\n' +
+      'Your role updates automatically — sell and it’s removed, buy more and you’re upgraded.',
+    footer: { text: 'Primos Holder Verification' },
+  }
+}
+
+// The button row attached to the verify panel. The button is public — anyone can
+// click it; the handler issues a private, one-time verification link.
+export function verifyPanelComponents() {
+  return [{
+    type: 1,
+    components: [{ type: 2, style: 3, label: 'Verify Wallet', emoji: { name: '✅' }, custom_id: 'verify_start' }],
+  }]
+}
+
 export function buildSaleEmbed({ priceSol, tokenMint, signature }) {
   return {
     title: '💰 New Primos Sale',

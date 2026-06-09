@@ -27,6 +27,8 @@ const commands = [
   },
   // Public: every member can run /verify (no default_member_permissions gate).
   { name: 'verify', description: 'Verify your Primos holdings to claim your holder tier role' },
+  // Mod-only: drop the persistent verification panel (embed + button) in a channel.
+  { name: 'verifypanel', description: 'Post the holder-verification panel in this channel', default_member_permissions: '0' },
 ]
 
 const res = await fetch(

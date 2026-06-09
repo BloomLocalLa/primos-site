@@ -1,5 +1,5 @@
 import { isAuthorized } from './permissions.js'
-import { buildStatsEmbed, buildAnnounceEmbed, buildLinksEmbed } from './embeds.js'
+import { buildStatsEmbed, buildAnnounceEmbed, buildLinksEmbed, buildVerifyPanelEmbed, verifyPanelComponents } from './embeds.js'
 
 const EPHEMERAL = 64
 
@@ -26,22 +26,26 @@ function previewWith(embed, confirmId, note) {
   return { type: 4, data: { flags: EPHEMERAL, content: note, embeds: [embed], components: confirmButtons(confirmId) } }
 }
 
+// Shared by the /verify command and the verify-panel button: issue a private,
+// one-time verification link for the member who triggered it.
+async function verifyLinkReply(interaction, deps) {
+  const userId = interaction.member?.user?.id || interaction.user?.id
+  const link = await deps.createVerifyLink(userId)
+  if (!link) return ephemeral('🛠️ Holder verification isn’t live yet — check back soon.')
+  return ephemeral(
+    '🔗 **Verify your Primos holdings**\n' +
+    'Connect your wallet and sign (free — no transaction) to claim your tier ' +
+    '(**Primo / Compadre / Tío / El Jefe**):\n' + link + '\n\n' +
+    '_Link expires in 10 minutes and only works for you._',
+  )
+}
+
 async function handleCommand(interaction, deps) {
   const { config } = deps
   const data = interaction.data
 
   // /verify is PUBLIC — any member can link their wallet to claim a tier role.
-  if (data.name === 'verify') {
-    const userId = interaction.member?.user?.id || interaction.user?.id
-    const link = await deps.createVerifyLink(userId)
-    if (!link) return ephemeral('🛠️ Holder verification isn’t live yet — check back soon.')
-    return ephemeral(
-      '🔗 **Verify your Primos holdings**\n' +
-      'Connect your wallet and sign (free — no transaction) to claim your tier ' +
-      '(**Primo / Compadre / Tío / El Jefe**):\n' + link + '\n\n' +
-      '_Link expires in 10 minutes and only works for you._',
-    )
-  }
+  if (data.name === 'verify') return verifyLinkReply(interaction, deps)
 
   // Everything below is mod-only.
   if (!isAuthorized(interaction.member, config.MOD_ROLE_ID)) {
@@ -75,6 +79,13 @@ async function handleCommand(interaction, deps) {
       const confirmId = `confirm:say:${channelId}:${asEmbed ? 'embed' : 'text'}`
       return previewWith(embed, confirmId, `Preview — Confirm to send to <#${channelId}>:`)
     }
+    case 'verifypanel': {
+      await deps.postMessage(interaction.channel_id, {
+        embeds: [buildVerifyPanelEmbed()],
+        components: verifyPanelComponents(),
+      })
+      return ephemeral('✅ Verification panel posted to this channel.')
+    }
     default:
       return ephemeral('Unknown command.')
   }
@@ -82,10 +93,15 @@ async function handleCommand(interaction, deps) {
 
 async function handleComponent(interaction, deps) {
   const { config } = deps
+  const customId = interaction.data.custom_id
+
+  // Public: the verify-panel button issues a private, one-time verification link.
+  if (customId === 'verify_start') return verifyLinkReply(interaction, deps)
+
+  // The confirm/cancel buttons below are mod-only.
   if (!isAuthorized(interaction.member, config.MOD_ROLE_ID)) {
     return ephemeral('🚫 You do not have permission.')
   }
-  const customId = interaction.data.custom_id
   const previewEmbed = interaction.message?.embeds?.[0]
 
   if (customId === 'cancel') {
