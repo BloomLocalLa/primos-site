@@ -176,9 +176,9 @@ export default function Home() {
         {/* Background video */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <video
-            className="absolute inset-0 w-full h-full object-contain"
-            src="/community/primos-pwo.mp4"
-            poster="/community/primos-pwo.jpg"
+            className="absolute inset-0 w-full h-full object-cover"
+            src="/community/primos-hero.mp4"
+            poster="/community/primos-hero.jpg"
             autoPlay
             muted
             loop
