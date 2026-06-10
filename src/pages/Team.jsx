@@ -8,7 +8,7 @@ const team = [
   {
     name: 'KOOKIE',
     role: 'Community Lead',
-    image: '/team/kookie.webp',
+    image: '/team/kookie.jpg',
     bio: 'Building the new Primos — site, bot, and everything in between.',
     socials: {
       twitter: 'https://x.com/Kookie_Jarz',
@@ -24,7 +24,7 @@ const team = [
   {
     name: 'BULLI',
     role: 'Community Lead',
-    image: '/team/bulli.webp',
+    image: '/team/bulli.jpg',
     bio: 'Enjoying the digital life, one Primo at a time.',
     socials: {
       twitter: 'https://x.com/Bullishhh',
@@ -33,7 +33,7 @@ const team = [
   {
     name: 'SYNT4X',
     role: 'Community Lead',
-    image: '/team/synt4x.webp',
+    image: '/team/synt4x.jpg',
     bio: 'In stealth mode. Ask about the ninja training.',
     socials: {
       twitter: 'https://x.com/0ffsetSynt4x',
@@ -42,7 +42,7 @@ const team = [
   {
     name: 'ZESTY',
     role: 'Community Lead',
-    image: '/team/zesty.webp',
+    image: '/team/zesty.jpg',
     bio: 'Degen-dalorian. This is the way.',
     socials: {
       twitter: 'https://x.com/zesty_degen',
@@ -60,7 +60,7 @@ const team = [
   {
     name: 'LORDIO',
     role: 'Community Lead',
-    image: '/team/lordio.webp',
+    image: '/team/lordio.jpg',
     bio: 'The original artist behind the pixels.',
     socials: {
       twitter: 'https://x.com/LordioWeb3',
@@ -69,10 +69,19 @@ const team = [
   {
     name: 'SOSO',
     role: 'Community Lead',
-    image: '/team/soso.webp',
+    image: '/team/soso.jpg',
     bio: 'aka Future. Solami soldier holding the line.',
     socials: {
       twitter: 'https://x.com/SolamiSoldier',
+    },
+  },
+  {
+    name: 'TAILINGTHESUN',
+    role: 'Community Lead',
+    image: '/team/tailingthesun.jpg',
+    bio: 'Web3 graphic designer and 1/1 artist.',
+    socials: {
+      twitter: 'https://x.com/_tailingthesun',
     },
   },
 ]
