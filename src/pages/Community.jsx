@@ -26,6 +26,27 @@ const communityArt = [
     video: true,
     borderColor: 'border-primo-cyan',
   },
+  {
+    title: 'Cinco de Mayo: Callejero Fest',
+    creator: '@PrimosNFT',
+    image: '/community/cdmx-fest.jpg',
+    link: 'https://x.com/PrimosNFT',
+    borderColor: 'border-primo-yellow',
+  },
+  {
+    title: 'Primos · April 21 2018',
+    creator: '@PrimosNFT',
+    image: '/community/skate-2018.jpg',
+    link: 'https://x.com/PrimosNFT',
+    borderColor: 'border-primo-green',
+  },
+  {
+    title: 'Family',
+    creator: '@PrimosNFT',
+    image: '/community/family.jpg',
+    link: 'https://x.com/PrimosNFT',
+    borderColor: 'border-primo-purple',
+  },
 ]
 
 // Community merch — placeholders until the merch store opens.
