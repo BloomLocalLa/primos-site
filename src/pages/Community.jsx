@@ -18,6 +18,14 @@ const communityArt = [
     video: true,
     borderColor: 'border-primo-pink',
   },
+  {
+    title: 'THEY NOT LIKE US!',
+    creator: '@PrimosNFT',
+    image: '/community/primos-pwo.jpg',
+    link: 'https://x.com/PrimosNFT/status/2052404787006803970',
+    video: true,
+    borderColor: 'border-primo-cyan',
+  },
 ]
 
 // Community merch — placeholders until the merch store opens.
