@@ -1,11 +1,31 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Twitter, MessageCircle, Heart, Users, Zap, TrendingUp, Package, ExternalLink, Wallet, Palette, Shirt, Frame } from 'lucide-react'
+import { Twitter, MessageCircle, Heart, Users, Zap, TrendingUp, Package, ExternalLink, Wallet, Palette, Shirt, Frame, Play } from 'lucide-react'
 import GlitchText from '../components/GlitchText'
 import { getCollectionStats, getRecentActivities, getHolderStats, lamportsToSol } from '../lib/magiceden'
 
 // Public IPFS gateways are unreliable for activity images; fall back to local artwork
 const FALLBACK_ARTWORK = '/artwork/QmaEPHgZct4F3E8y7XMhcYJScFzuowSjW1w6oQbaeYiUSw.avif'
+
+// Community art aggregated from X. Media (or video poster frames) saved locally in
+// /public/community/. To feature a post: drop its image in that folder and add an entry.
+const communityArt = [
+  {
+    title: 'gm primos',
+    creator: '@LordioWeb3',
+    image: '/community/lordio-gm.jpg',
+    link: 'https://x.com/LordioWeb3/status/2062910164244795834',
+    video: true,
+    borderColor: 'border-primo-pink',
+  },
+]
+
+// Community merch — placeholders until the merch store opens.
+const communityMerch = [
+  { title: 'Primos Tee', image: '/artwork/QmX6ywFVdXwPjjUYcYEqhKMttWmW8ueCzZxHSmj8EKNzbL.avif', borderColor: 'border-primo-yellow' },
+  { title: 'Primos Hoodie', image: '/artwork/QmagjfWJXmrStQP7sYsEqytPV2yXtyRhKTcT3Ngqw8D1MA.avif', borderColor: 'border-primo-cyan' },
+  { title: 'Primos Cap', image: '/artwork/QmZUWtRTo4RigUSbPwHWQ93gM6azjP1hZCP2HdCLWdp93g.avif', borderColor: 'border-primo-green' },
+]
 
 export default function Community() {
   const [stats, setStats] = useState(null)
@@ -291,38 +311,15 @@ export default function Community() {
             FROM THE COMMUNITY
           </h2>
 
+          {/* Community Art */}
+          <h3 className="font-display text-primo-pink text-base md:text-lg tracking-wider mb-3 md:mb-4 flex items-center gap-2">
+            <Frame size={16} />
+            COMMUNITY ART
+          </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
-            {[
-              {
-                type: 'art',
-                title: 'Primo Pixel Animation',
-                creator: '@PixelArtist3D',
-                image: '/artwork/QmagjfWJXmrStQP7sYsEqytPV2yXtyRhKTcT3Ngqw8D1MA.avif',
-                link: 'https://x.com/primosnft',
-                icon: Frame,
-                borderColor: 'border-primo-pink',
-              },
-              {
-                type: 'merch',
-                title: 'Primo Hoodie Design',
-                creator: '@MerchMaster',
-                image: '/artwork/QmX6ywFVdXwPjjUYcYEqhKMttWmW8ueCzZxHSmj8EKNzbL.avif',
-                link: 'https://x.com/primosnft',
-                icon: Shirt,
-                borderColor: 'border-primo-yellow',
-              },
-              {
-                type: 'art',
-                title: 'Primos Group Portrait',
-                creator: '@NFTCreator',
-                image: '/artwork/QmZUWtRTo4RigUSbPwHWQ93gM6azjP1hZCP2HdCLWdp93g.avif',
-                link: 'https://x.com/primosnft',
-                icon: Frame,
-                borderColor: 'border-primo-cyan',
-              },
-            ].map((item, index) => (
+            {communityArt.map((item, index) => (
               <motion.a
-                key={item.title}
+                key={item.link}
                 href={item.link}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -331,25 +328,71 @@ export default function Community() {
                 transition={{ delay: index * 0.1 }}
                 className={`bg-black border-2 md:border-4 ${item.borderColor} overflow-hidden group`}
               >
-                <div className="aspect-square overflow-hidden">
+                <div className="relative aspect-square overflow-hidden">
                   <img
                     src={item.image}
                     alt={item.title}
                     className="w-full h-full object-cover"
                     loading="lazy"
                   />
+                  {item.video && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
+                      <div className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-black/60 border-2 border-white flex items-center justify-center">
+                        <Play size={20} className="text-white ml-0.5 md:w-7 md:h-7" fill="white" />
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="p-2 md:p-4">
                   <div className="flex items-center gap-1.5 md:gap-2 mb-1 md:mb-2">
-                    <item.icon size={12} className="text-white/60 md:w-4 md:h-4" />
+                    <Twitter size={12} className="text-white/60 md:w-4 md:h-4" />
                     <span className="text-white/60 text-[10px] md:text-xs font-mono uppercase">
-                      {item.type}
+                      {item.video ? 'video' : 'art'}
                     </span>
                   </div>
                   <h3 className="font-display text-white text-sm md:text-base mb-0.5 md:mb-1 truncate">{item.title}</h3>
                   <p className="text-primo-cyan text-xs md:text-sm font-mono truncate">{item.creator}</p>
                 </div>
               </motion.a>
+            ))}
+          </div>
+
+          {/* Community Merch */}
+          <h3 className="font-display text-primo-yellow text-base md:text-lg tracking-wider mt-8 md:mt-10 mb-3 md:mb-4 flex items-center gap-2">
+            <Shirt size={16} />
+            COMMUNITY MERCH
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
+            {communityMerch.map((item, index) => (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className={`bg-black border-2 md:border-4 ${item.borderColor} overflow-hidden group`}
+              >
+                <div className="relative aspect-square overflow-hidden">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-cover grayscale opacity-50"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="px-3 py-1 bg-black/70 border border-white/30 text-white text-[10px] md:text-xs font-display tracking-wider">
+                      COMING SOON
+                    </span>
+                  </div>
+                </div>
+                <div className="p-2 md:p-4">
+                  <div className="flex items-center gap-1.5 md:gap-2 mb-1 md:mb-2">
+                    <Shirt size={12} className="text-white/60 md:w-4 md:h-4" />
+                    <span className="text-white/60 text-[10px] md:text-xs font-mono uppercase">merch</span>
+                  </div>
+                  <h3 className="font-display text-white text-sm md:text-base mb-0.5 md:mb-1 truncate">{item.title}</h3>
+                  <p className="text-static-gray text-xs md:text-sm font-mono truncate">Drops soon</p>
+                </div>
+              </motion.div>
             ))}
           </div>
 
