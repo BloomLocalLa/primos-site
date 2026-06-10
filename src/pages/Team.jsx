@@ -17,9 +17,11 @@ const team = [
   {
     name: 'CICO',
     role: 'Community Lead',
-    image: '/team/cico.webp',
+    image: '/team/cico.jpg',
     bio: 'Day-one Primo keeping the community moving.',
-    socials: {},
+    socials: {
+      twitter: 'https://x.com/SalvatoreMaceo',
+    },
   },
   {
     name: 'BULLI',
