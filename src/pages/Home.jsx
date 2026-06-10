@@ -173,6 +173,38 @@ export default function Home() {
         style={{ y: heroY, opacity: heroOpacity }}
         className="relative min-h-screen flex items-center justify-center overflow-hidden"
       >
+        {/* Background video */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <video
+            className="absolute inset-0 w-full h-full object-cover"
+            src="/community/primos-pwo.mp4"
+            poster="/community/primos-pwo.jpg"
+            autoPlay
+            muted
+            loop
+            playsInline
+            style={{ filter: 'saturate(1.1) contrast(1.1) brightness(0.55)' }}
+          />
+          {/* Darken for text legibility */}
+          <div className="absolute inset-0 bg-black/40" />
+          {/* Scanlines */}
+          <div
+            className="absolute inset-0 opacity-60"
+            style={{
+              background:
+                'repeating-linear-gradient(0deg, rgba(0,0,0,0.35) 0px, rgba(0,0,0,0.35) 1px, transparent 1px, transparent 3px)',
+            }}
+          />
+          {/* Vignette */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.75) 100%)',
+            }}
+          />
+        </div>
+
         {/* Gradient Orbs */}
         <div className="absolute inset-0 overflow-hidden">
           <motion.div
