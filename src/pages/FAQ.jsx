@@ -35,7 +35,12 @@ const faqCategories = [
     items: [
       {
         question: 'Where can I buy a Primo?',
-        answer: 'Primos are available on Magic Eden, the largest NFT marketplace on Solana. Simply connect your Solana wallet (like Phantom or Solflare), browse the collection, and purchase any listed Primo.',
+        answer: 'Primos are listed across all the major Solana NFT marketplaces. Connect your Solana wallet (like Phantom or Solflare), browse the collection on any of them, and grab any listed Primo.',
+        links: [
+          { label: 'Magic Eden', url: 'https://magiceden.io/marketplace/primos' },
+          { label: 'Tensor', url: 'https://www.tensor.trade/trade/primos' },
+          { label: 'Orbis', url: 'https://www.orbisonsol.io/marketplace/primos' },
+        ],
       },
       {
         question: 'What wallet do I need?',

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Plus, Minus } from 'lucide-react'
+import { ChevronDown, Plus, Minus, ExternalLink } from 'lucide-react'
 
 export default function FAQAccordion({ items = [], category = '' }) {
   const [openIndex, setOpenIndex] = useState(null)
@@ -55,6 +55,23 @@ export default function FAQAccordion({ items = [], category = '' }) {
                   >
                     {item.answer}
                   </motion.p>
+
+                  {item.links && (
+                    <div className="flex flex-wrap gap-2 mt-3 md:mt-4">
+                      {item.links.map((link) => (
+                        <a
+                          key={link.url}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-static-dark border border-static-gray text-white text-xs md:text-sm font-display tracking-wide hover:border-primo-cyan hover:text-primo-cyan transition-colors"
+                        >
+                          {link.label}
+                          <ExternalLink size={14} />
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
