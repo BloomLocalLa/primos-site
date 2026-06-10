@@ -2,15 +2,77 @@ import { motion } from 'framer-motion'
 import { Twitter, MessageCircle, Globe, Sparkles } from 'lucide-react'
 import GlitchText from '../components/GlitchText'
 
+// Primos is a community takeover (CTO) — these are the community leaders.
+// Avatars are stored locally in /public/team/ so they can't rot like hotlinked URLs.
 const team = [
   {
+    name: 'KOOKIE',
+    role: 'Community Lead',
+    image: '/team/kookie.webp',
+    bio: 'Building the new Primos — site, bot, and everything in between.',
+    socials: {
+      twitter: 'https://x.com/Kookie_Jarz',
+    },
+  },
+  {
+    name: 'CICO',
+    role: 'Community Lead',
+    image: '/team/cico.webp',
+    bio: 'Day-one Primo keeping the community moving.',
+    socials: {},
+  },
+  {
+    name: 'BULLI',
+    role: 'Community Lead',
+    image: '/team/bulli.webp',
+    bio: 'Enjoying the digital life, one Primo at a time.',
+    socials: {
+      twitter: 'https://x.com/Bullishhh',
+    },
+  },
+  {
+    name: 'SYNT4X',
+    role: 'Community Lead',
+    image: '/team/synt4x.webp',
+    bio: 'In stealth mode. Ask about the ninja training.',
+    socials: {
+      twitter: 'https://x.com/0ffsetSynt4x',
+    },
+  },
+  {
+    name: 'ZESTY',
+    role: 'Community Lead',
+    image: '/team/zesty.webp',
+    bio: 'Degen-dalorian. This is the way.',
+    socials: {
+      twitter: 'https://x.com/zesty_degen',
+    },
+  },
+  {
+    name: 'ORIGAMI',
+    role: 'Community Lead',
+    image: '/team/origami.jpg',
+    bio: 'Everyday is taco tuesday when you are a Primo.',
+    socials: {
+      twitter: 'https://x.com/Origami_hands',
+    },
+  },
+  {
     name: 'LORDIO',
-    role: 'Founder & Artist',
-    image: 'https://pbs.twimg.com/profile_images/2012171988849319936/m_E3LWcz_400x400.jpg',
-    bio: 'The creative mind behind Primos. Building a community within communities on Solana.',
+    role: 'Community Lead',
+    image: '/team/lordio.webp',
+    bio: 'The original artist behind the pixels.',
     socials: {
       twitter: 'https://x.com/LordioWeb3',
-      discord: 'https://discord.gg/XhCcZNfEVn',
+    },
+  },
+  {
+    name: 'SOSO',
+    role: 'Community Lead',
+    image: '/team/soso.webp',
+    bio: 'aka Future. Solami soldier holding the line.',
+    socials: {
+      twitter: 'https://x.com/SolamiSoldier',
     },
   },
 ]
@@ -29,19 +91,19 @@ export default function Team() {
             <GlitchText text="THE TEAM" />
           </h1>
           <p className="text-static-gray font-mono max-w-xl mx-auto text-sm md:text-base">
-            Meet the human behind the pixels.
+            Primos is community-owned. Meet the leaders keeping the pixels alive.
           </p>
         </motion.div>
 
         {/* Team Grid */}
-        <div className="flex justify-center px-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
           {team.map((member, index) => (
             <motion.div
               key={member.name}
               initial={{ opacity: 0, y: 50, rotate: -5 }}
               animate={{ opacity: 1, y: 0, rotate: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="group w-full max-w-xs md:max-w-sm"
+              className="group w-full"
             >
               <div className="bg-black border-2 md:border-4 border-white overflow-hidden relative">
                 {/* Glitch Effect Layers */}
