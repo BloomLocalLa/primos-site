@@ -112,15 +112,15 @@ export default function Team() {
               initial={{ opacity: 0, y: 50, rotate: -5 }}
               animate={{ opacity: 1, y: 0, rotate: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="group w-full"
+              className="group w-full h-full"
             >
-              <div className="bg-black border-2 md:border-4 border-white overflow-hidden relative">
+              <div className="bg-black border-2 md:border-4 border-white overflow-hidden relative h-full flex flex-col">
                 {/* Glitch Effect Layers */}
                 <div className="absolute inset-0 bg-primo-red/0 group-hover:bg-primo-red/20 translate-x-0 group-hover:translate-x-1 transition-all z-10 pointer-events-none" />
                 <div className="absolute inset-0 bg-primo-cyan/0 group-hover:bg-primo-cyan/20 translate-x-0 group-hover:-translate-x-1 transition-all z-10 pointer-events-none" />
 
                 {/* Image */}
-                <div className="relative aspect-square overflow-hidden">
+                <div className="relative aspect-square overflow-hidden flex-shrink-0">
                   <motion.img
                     src={member.image}
                     alt={member.name}
@@ -138,7 +138,7 @@ export default function Team() {
                 </div>
 
                 {/* Info */}
-                <div className="p-4 md:p-6 border-t-2 md:border-t-4 border-white">
+                <div className="p-4 md:p-6 border-t-2 md:border-t-4 border-white flex-1 flex flex-col">
                   <h3 className="font-display text-lg md:text-xl text-white mb-1 flex items-center gap-2">
                     {member.name}
                     <Sparkles size={14} className="text-primo-yellow md:w-4 md:h-4" />
@@ -147,7 +147,7 @@ export default function Team() {
                   <p className="text-static-gray text-xs md:text-sm mb-3 md:mb-4">{member.bio}</p>
 
                   {/* Socials */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 mt-auto">
                     {member.socials.twitter && (
                       <motion.a
                         href={member.socials.twitter}
